@@ -16,9 +16,9 @@
     "description": "A stylized infinite runner game. The blue hedgehog collects golden rings and jumps over spiked obstacles, with spawn rates and game speed matching the track's active tempo.",
 	"category": "game",    
     "cover": {
-      "original": "https://plugins.bilbomusic.com/img/plugin/original/sonic-rhytm-dash.jpg",
-      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/sonic-rhytm-dash.jpg",
-      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/sonic-rhytm-dash.jpg"
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/sonic-rhythm-dash.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/sonic-rhythm-dash.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/sonic-rhythm-dash.jpg"
     }
   },
   {
