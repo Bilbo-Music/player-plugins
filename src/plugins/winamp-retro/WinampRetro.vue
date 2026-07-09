@@ -757,6 +757,17 @@ onMounted(() => {
         if (state?.panes?.default?.position !== undefined) {
             playbackPosition.value = state.panes.default.position
         }
+
+
+        if (state?.styles) {
+            const root = document.documentElement;
+
+            Object.entries(state.styles).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    root.style.setProperty(key, value);
+                }
+            });
+        }
     }
 
     const onOpen = (payload) => {

@@ -1260,6 +1260,16 @@ onMounted(() => {
         if (state?.panes?.default?.position !== undefined) {
             playbackPosition.value = state.panes.default.position
         }
+
+        if (state?.styles) {
+            const root = document.documentElement;
+
+            Object.entries(state.styles).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    root.style.setProperty(key, value);
+                }
+            });
+        }
     }
 
     const onOpen = (payload) => {
@@ -1419,6 +1429,7 @@ onMounted(() => {
     padding: 14px 20px;
     z-index: 30;
     position: relative;
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 14px);
 }
 
 .header-content {

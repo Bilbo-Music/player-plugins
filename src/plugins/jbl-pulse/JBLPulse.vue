@@ -132,6 +132,16 @@ const onInit = (state) => {
     if (state?.panes?.default?.track) {
         trackBpm.value = state.panes.default.track.bpm || 90
     }
+
+    if (state?.styles) {
+        const root = document.documentElement;
+
+        Object.entries(state.styles).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                root.style.setProperty(key, value);
+            }
+        });
+    }
 }
 
 const onOpen = (payload) => {

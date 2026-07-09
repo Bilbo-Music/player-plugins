@@ -1021,6 +1021,16 @@ onMounted(() => {
         if (state?.panes?.default?.reaction) {
             reaction.value = state.panes.default.reaction
         }
+
+        if (state?.styles) {
+            const root = document.documentElement;
+
+            Object.entries(state.styles).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    root.style.setProperty(key, value);
+                }
+            });
+        }
     }
 
     const onOpen = (payload) => {
@@ -1187,16 +1197,17 @@ onMounted(() => {
 /* TOP TRACK HEADER BAR */
 .neb-top-panel {
     width: 100%;
-    height: 72px;
+    min-height: 72px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
     z-index: 10;
-    padding: 0 16px;
+    padding: 0 16px 12px;
     border-bottom: 1.5px solid rgba(5, 217, 232, 0.2);
     background: rgba(10, 2, 24, 0.96);
     backdrop-filter: blur(8px);
     flex-shrink: 0;
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
 }
 
 .neb-track-card {

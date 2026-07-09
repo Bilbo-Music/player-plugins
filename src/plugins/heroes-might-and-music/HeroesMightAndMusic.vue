@@ -382,6 +382,16 @@ const onInit = (state) => {
     if (state?.panes?.default?.track) updateTrackData(state.panes.default.track)
     if (state?.panes?.default?.state) playerState.value = state.panes.default.state
     if (state?.panes?.default?.reaction) reaction.value = state.panes.default.reaction
+
+    if (state?.styles) {
+        const root = document.documentElement;
+
+        Object.entries(state.styles).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                root.style.setProperty(key, value);
+            }
+        });
+    }
 }
 
 const onOpen = (payload) => { if (payload?.track) updateTrackData(payload.track) }
@@ -1510,12 +1520,13 @@ const formatNumber = (num) => {
 
 .top-panel {
     top: 0;
-    height: 96px;
-    padding: 0 20px;
+    min-height: 96px;
+    padding: 0 20px 12px;
     justify-content: space-between;
     gap: 16px;
     border-bottom: 3px solid #7a5f3c;
     box-shadow: 0 2px 0 #c9a13a inset;
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
 }
 
 .track-card {
@@ -1563,7 +1574,8 @@ const formatNumber = (num) => {
 
 .resource-bar {
     position: absolute;
-    top: 108px; left: 16px;
+    top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 112px);
+    left: 16px;
     z-index: 10;
     display: flex;
     gap: 8px;

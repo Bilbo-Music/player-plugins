@@ -1548,6 +1548,26 @@ onMounted(() => {
         if (state?.panes?.default?.reaction) {
             reaction.value = state.panes.default.reaction
         }
+
+        if (state?.styles) {
+            const root = document.documentElement;
+
+            Object.entries(state.styles).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    root.style.setProperty(key, value);
+                }
+            });
+        }
+
+        if (state?.styles) {
+            const root = document.documentElement;
+
+            Object.entries(state.styles).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    root.style.setProperty(key, value);
+                }
+            });
+        }
     }
 
     const onOpen = (payload) => {
@@ -1786,13 +1806,14 @@ const handleRepeat = () => {
 /* TOP TRACK PANEL */
 .lofi-top-panel {
     width: 100%;
-    height: 80px;
+    min-height: 80px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
     z-index: 10;
-    padding: 0 20px;
+    padding: 0 20px 12px;
     border-bottom: 2px solid rgba(255, 170, 102, 0.25);
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
     background: rgba(14, 11, 26, 0.96);
     flex-shrink: 0;
 }

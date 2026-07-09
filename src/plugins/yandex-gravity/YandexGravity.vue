@@ -256,6 +256,17 @@ const onInit = (state) => {
     if (state?.panes?.default?.track) updateTrackData(state.panes.default.track)
     if (state?.panes?.default?.state) playerState.value = state.panes.default.state
     if (state?.panes?.default?.reaction) reaction.value = state.panes.default.reaction
+
+
+    if (state?.styles) {
+        const root = document.documentElement;
+
+        Object.entries(state.styles).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                root.style.setProperty(key, value);
+            }
+        });
+    }
 }
 
 const onOpen = (payload) => { 
@@ -759,14 +770,15 @@ const formatNumber = (num) => {
     top: 0; 
     left: 0; 
     width: 100vw; 
-    height: 90px;
+    min-height: 90px;
     box-sizing: border-box; 
     display: flex; 
     align-items: center; 
     justify-content: space-between;
-    padding: 0 24px; 
+    padding: 0 24px 12px; 
     z-index: 10; 
     border-bottom: 1px solid transparent;
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
 }
 
 .dark .top-panel { 
@@ -863,7 +875,7 @@ const formatNumber = (num) => {
 /* HUD PANEL */
 .score-panel {
     position: absolute; 
-    top: 105px; 
+    top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 100px);
     left: 24px; 
     z-index: 5; 
     pointer-events: none;

@@ -249,6 +249,16 @@ const onInit = (state) => {
     if (state?.panes?.default?.reaction) {
         reaction.value = state.panes.default.reaction
     }
+
+    if (state?.styles) {
+        const root = document.documentElement;
+
+        Object.entries(state.styles).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                root.style.setProperty(key, value);
+            }
+        });
+    }
 }
 
 const onOpen = (payload) => {
@@ -971,13 +981,14 @@ const formatNumber = (num) => {
 /* TOP PANEL CONFIGURATION */
 .top-panel {
     top: 0;
-    height: 100px;
+    min-height: 100px;
     border-bottom: 1px solid;
-    padding: 0 24px;
+    padding: 0 24px 12px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
 }
 
 .top-panel .track-card {
@@ -1059,7 +1070,7 @@ const formatNumber = (num) => {
 /* INDEPENDENT SCORE HUD PANEL */
 .score-panel {
     position: absolute;
-    top: 116px; 
+    top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 100px);
     left: 16px;
     z-index: 10;
     display: flex;
