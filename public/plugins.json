@@ -1,0 +1,102 @@
+[
+  {
+    "code": "jbl-pulse",
+    "name": "JBL Pulse",
+    "description": "A realistic 3D cylinder speaker utilizing circular LED equalizer rings. Color schemes and wave patterns dynamically shift depending on the active track's genre.",
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/jbl-pulse.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/jbl-pulse.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/jbl-pulse.jpg"
+    }
+  },
+  {
+    "code": "sonic-rhythm-dash",
+    "name": "Sonic Rhythm Dash",
+    "description": "A stylized infinite runner game. The blue hedgehog collects golden rings and jumps over spiked obstacles, with spawn rates and game speed matching the track's active tempo.",
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/sonic-rhytm-dash.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/sonic-rhytm-dash.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/sonic-rhytm-dash.jpg"
+    }
+  },
+  {
+    "code": "yandex-gravity",
+    "name": "Yandex Gravity",
+    "description": "An interactive physics canvas with zero gravity. Album covers, control cards, and badges float freely, colliding and responding to user drag-and-throw gestures.",
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/yandex-gravity.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/yandex-gravity.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/yandex-gravity.jpg"
+    }
+  },
+  {
+    "code": "might-and-music",
+    "name": "Might & Music",
+    "description": "A pixel-art tactical turn-based battle arena paying homage to Heroes of Might and Magic III. Heroes fight and cast spells in sync with the track's tempo and rhythm.",
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/might-and-music.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/might-and-music.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/might-and-music.jpg"
+    }
+  },
+  {
+    "code": "gravity-synthwave",
+    "name": "Gravity Synthwave",
+    "description": "A legendary trial bike physics game inspired by the J2ME phone era. The rider accelerates, brakes, and performs flips over procedurally generated hills fueled by the song's BPM.",
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/gravity-synthwave.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/gravity-synthwave.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/gravity-synthwave.jpg"
+    }
+  },
+  {
+    "code": "nebula-ride",
+    "name": "Nebula Ride",
+    "description": "A cosmic, meditative space flight experience. Galactic stars and deep nebula clouds warp and pulsate in response to the high and low frequencies of the audio stream.",
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/nebula-ride.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/nebula-ride.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/nebula-ride.jpg"
+    }
+  },
+  {
+    "code": "audio-bounce",
+    "name": "Audio Bounce",
+    "description": "A retro physics-based brick-breaker/pong game. The ball and paddles bounce off of frequency barriers generated live from the audio visualizer spectrum.",
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/audio-bounce.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/audio-bounce.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/audio-bounce.jpg"
+    }
+  },
+  {
+    "code": "lofi-cozy",
+    "name": "Lofi Cozy",
+    "description": "A warm, animated ambient room featuring a crackling fireplace, raindrops sliding down the window, and a steaming cup of tea. Perfect for focus sessions and background chillout.",
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/lofi-cozy.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/lofi-cozy.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/lofi-cozy.jpg"
+    }
+  },
+  {
+    "code": "winamp-retro",
+    "name": "Winamp RETRO",
+    "description": "A nostalgic tribute to the legendary 90s player. Features classic pixel equalizers, spinning cassette reels, custom skin styling, and authentic vintage control buttons.",
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/winamp-retro.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/winamp-retro.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/winamp-retro.jpg"
+    }
+  },
+  {
+    "code": "vultisig-vault",
+    "name": "Vultisig Vault",
+    "description": "An interactive cyberpunk vaults dashboard with Multi-Party Computation (MPC) simulation. Signing tracks triggers cryptographic terminal animations, and user-initiated transactions spark visual block consensus sequences.",
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/vultisig-vault.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/vultisig-vault.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/vultisig-vault.jpg"
+    }
+  }
+]
