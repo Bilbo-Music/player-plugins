@@ -15,8 +15,8 @@
     });
 
     const pluginRegistry = {
-        'jpl-pulse': defineAsyncComponent(() => import('@/plugins/jbl-pulse/JBLPulse.vue')),
-        'sonic-rhytm-dash': defineAsyncComponent(() => import('@/plugins/sonic-rhytm-dash/SonicRhytmDash.vue')),
+        'jbl-pulse': defineAsyncComponent(() => import('@/plugins/jbl-pulse/JBLPulse.vue')),
+        'sonic-rhythm-dash': defineAsyncComponent(() => import('@/plugins/sonic-rhythm-dash/SonicRhythmDash.vue')),
         'yandex-gravity': defineAsyncComponent(() => import('@/plugins/yandex-gravity/YandexGravity.vue')),
         'might-and-music': defineAsyncComponent(() => import('@/plugins/heroes-might-and-music/HeroesMightAndMusic.vue')),
         'gravity-synthwave': defineAsyncComponent(() => import('@/plugins/gravity-synthwave/GravitySynthwave.vue')),
