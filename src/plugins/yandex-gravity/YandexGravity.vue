@@ -778,7 +778,7 @@ const formatNumber = (num) => {
     padding: 0 24px 12px; 
     z-index: 10; 
     border-bottom: 1px solid transparent;
-    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));
 }
 
 .dark .top-panel { 
@@ -875,7 +875,7 @@ const formatNumber = (num) => {
 /* HUD PANEL */
 .score-panel {
     position: absolute; 
-    top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 100px);
+    top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 88px);
     left: 24px; 
     z-index: 5; 
     pointer-events: none;

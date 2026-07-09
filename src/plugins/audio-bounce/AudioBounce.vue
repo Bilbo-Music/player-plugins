@@ -1150,7 +1150,7 @@ const formatNumber = (num) => {
     border-bottom: 2px solid rgba(5, 217, 232, 0.25);
     background: rgba(10, 1, 26, 0.95);
     flex-shrink: 0;
-    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));
 }
 
 .ab-track-card {

@@ -1813,7 +1813,7 @@ const handleRepeat = () => {
     z-index: 10;
     padding: 0 20px 12px;
     border-bottom: 2px solid rgba(255, 170, 102, 0.25);
-    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));
     background: rgba(14, 11, 26, 0.96);
     flex-shrink: 0;
 }

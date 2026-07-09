@@ -1429,7 +1429,7 @@ onMounted(() => {
     padding: 14px 20px;
     z-index: 30;
     position: relative;
-    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 14px);
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 2px);
 }
 
 .header-content {

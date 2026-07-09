@@ -1207,7 +1207,7 @@ onMounted(() => {
     background: rgba(10, 2, 24, 0.96);
     backdrop-filter: blur(8px);
     flex-shrink: 0;
-    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));
 }
 
 .neb-track-card {

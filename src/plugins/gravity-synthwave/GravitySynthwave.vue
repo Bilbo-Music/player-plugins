@@ -1428,7 +1428,7 @@ onMounted(() => {
 .gd-container {
     position: fixed;
     top: 0;
-    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));
     left: 0;
     width: 100vw;
     height: 100vh;
@@ -1468,7 +1468,7 @@ onMounted(() => {
     padding: 0 16px 12px;
     justify-content: space-between;
     gap: 12px;
-    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));
 }
 
 .track-card { display: flex; align-items: center; gap: 12px; flex-grow: 1; min-width: 0; }
@@ -1500,7 +1500,7 @@ onMounted(() => {
 
 .score-panel {
     position: fixed;
-    top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 100px);
+    top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 88px);
 
     left: 14px;
     z-index: 10;

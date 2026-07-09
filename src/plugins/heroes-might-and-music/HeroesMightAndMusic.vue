@@ -1526,7 +1526,7 @@ const formatNumber = (num) => {
     gap: 16px;
     border-bottom: 3px solid #7a5f3c;
     box-shadow: 0 2px 0 #c9a13a inset;
-    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));
 }
 
 .track-card {
@@ -1574,7 +1574,7 @@ const formatNumber = (num) => {
 
 .resource-bar {
     position: absolute;
-    top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 112px);
+    top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 100px);
     left: 16px;
     z-index: 10;
     display: flex;

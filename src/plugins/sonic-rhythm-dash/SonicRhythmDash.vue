@@ -988,7 +988,7 @@ const formatNumber = (num) => {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 12px);
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));
 }
 
 .top-panel .track-card {
@@ -1070,7 +1070,7 @@ const formatNumber = (num) => {
 /* INDEPENDENT SCORE HUD PANEL */
 .score-panel {
     position: absolute;
-    top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 100px);
+    top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 88px);
     left: 16px;
     z-index: 10;
     display: flex;
