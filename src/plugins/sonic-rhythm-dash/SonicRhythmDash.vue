@@ -11,7 +11,7 @@
         ></canvas>
 
         <!-- TOP PANEL: Track information -->
-        <div class="ui-panel top-panel">
+        <div ref="topPanelRef" class="ui-panel top-panel">
             <div class="track-card">
                 <div class="track-cover" :class="{ 'is-loading': !isCoverLoaded }">
                     <img 
@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { playerSdk } from '@bilbomusic/player-plugin-sdk'
 
 // -----------------------------------------------------------------
@@ -81,6 +81,7 @@ import { playerSdk } from '@bilbomusic/player-plugin-sdk'
 const canvasRef = ref(null)
 const minimapRef = ref(null)
 const minimapCanvasRef = ref(null)
+const topPanelRef = ref(null)
 
 const theme = ref('dark')
 const isExpanded = ref(true)
@@ -106,9 +107,15 @@ const trackInfo = ref({
 })
 
 // UI Layout constants for canvas boundaries
-const TOP_UI_HEIGHT = 100
+const TOP_UI_HEIGHT = ref(100)
 const BOTTOM_UI_HEIGHT = 110
 const SYNC_THRESHOLD = 1000
+
+const updateTopUiHeight = () => {
+    if (topPanelRef.value) {
+        TOP_UI_HEIGHT.value = topPanelRef.value.offsetHeight || 100
+    }
+}
 
 // Physics state
 let currentTime = 0
@@ -154,6 +161,7 @@ const initCanvas = () => {
     handleCanvasResize = () => {
         canvas.width = canvas.parentElement.clientWidth
         canvas.height = canvas.parentElement.clientHeight
+        updateTopUiHeight()
     }
     handleCanvasResize ()
     window.addEventListener('resize', handleCanvasResize)
@@ -195,6 +203,9 @@ onMounted(() => {
     initCanvas()
     initMinimap()
     startLoop()
+    nextTick(() => {
+        updateTopUiHeight()
+    })
 })
 
 onBeforeUnmount(() => {
@@ -258,6 +269,9 @@ const onInit = (state) => {
                 root.style.setProperty(key, value);
             }
         });
+        nextTick(() => {
+            updateTopUiHeight()
+        })
     }
 }
 
@@ -389,7 +403,7 @@ const startLoop = () => {
         const colorFloor = isDark ? '#18181b' : '#e4e4e7'
         const colorSonic = isDark ? '#00f0ff' : '#2082f0'
         
-        const gameTopY = TOP_UI_HEIGHT
+        const gameTopY = TOP_UI_HEIGHT.value
         const gameBottomY = h - BOTTOM_UI_HEIGHT
         const playableHeight = gameBottomY - gameTopY
         const gameMidY = gameTopY + playableHeight * 0.6
@@ -728,7 +742,7 @@ const handlePressStart = (e) => {
     const y = clientY - rect.top
     const canvasH = canvasRef.value.height
 
-    if (y > canvasH - BOTTOM_UI_HEIGHT || y < TOP_UI_HEIGHT) return
+    if (y > canvasH - BOTTOM_UI_HEIGHT || y < TOP_UI_HEIGHT.value) return
     if (sonic.isGrounded && playerState.value === 'playing') {
         isChargingJump = true
         jumpCharge = sonic.baseJumpForce
@@ -981,11 +995,11 @@ const formatNumber = (num) => {
 /* TOP PANEL CONFIGURATION */
 .top-panel {
     top: 0;
-    min-height: 100px;
+    min-height: 90px;
     border-bottom: 1px solid;
     padding: 0 24px 12px;
     display: flex;
-    align-items: center;
+    align-items: end;
     justify-content: space-between;
     gap: 16px;
     padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));

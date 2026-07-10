@@ -1,7 +1,7 @@
 <template>
     <div class="nebula-container" :class="[theme]" id="neb-app-container">
         <!-- TOP TRACK INFO BAR -->
-        <div class="neb-top-panel" id="neb-top-panel">
+        <div ref="topPanelRef" class="neb-top-panel" id="neb-top-panel">
             <div class="neb-track-card" id="neb-track-card">
                 <div class="neb-cover-wrapper" id="neb-cover-wrapper">
                     <img
@@ -125,15 +125,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { playerSdk } from '@bilbomusic/player-plugin-sdk'
 
 const canvasRef = ref(null)
+const topPanelRef = ref(null)
 const theme = ref('dark')
 const playerState = ref('paused')
 const reaction = ref('')
 const repeat = ref('none')
 const isCoverLoaded = ref(false)
+
+const TOP_UI_HEIGHT = ref(72)
+
+const updateTopUiHeight = () => {
+    if (topPanelRef.value) {
+        TOP_UI_HEIGHT.value = topPanelRef.value.offsetHeight || 72
+    }
+}
 
 const nextDisabled = ref(false)
 const prevDisabled = ref(true)
@@ -254,7 +263,7 @@ const handlePointerDown = (e) => {
     }
     
     isDragging = true
-    ship.targetY = Math.max(40, Math.min(canvas.height - 40, clientY))
+    ship.targetY = Math.max(TOP_UI_HEIGHT.value + 15, Math.min(canvas.height - 40, clientY))
     dragPoint.x = clientX
     dragPoint.y = clientY
 
@@ -271,7 +280,7 @@ const handlePointerMove = (e) => {
     const clientY = e.clientY - rect.top
     const clientX = e.clientX - rect.left
     
-    ship.targetY = Math.max(40, Math.min(canvas.height - 40, clientY))
+    ship.targetY = Math.max(TOP_UI_HEIGHT.value + 15, Math.min(canvas.height - 40, clientY))
     dragPoint.x = clientX
     dragPoint.y = clientY
 
@@ -379,7 +388,7 @@ const updateGamePhysics = (dt, w, h) => {
         nextSpawnTimer = Math.max(600, 1500 - audioData.bass * 700) // faster spawn on beats
         
         const rSpawn = Math.random()
-        const targetSpawnY = Math.max(50, Math.min(h - 80, Math.random() * h))
+        const targetSpawnY = Math.max(TOP_UI_HEIGHT.value + 15, Math.min(h - 80, Math.random() * h))
 
         if (rSpawn < 0.68) {
             // Spawn standard glowing orbs (Pink / Cyan / Yellow)
@@ -846,10 +855,14 @@ onMounted(() => {
                 ship.targetY = canvas.height / 2
             }
         }
+        updateTopUiHeight()
     }
 
     handleResize()
     window.addEventListener('resize', handleResize)
+    nextTick(() => {
+        updateTopUiHeight()
+    })
 
     // Start principal animation loop
     const renderLoop = (timestamp) => {
@@ -1030,6 +1043,9 @@ onMounted(() => {
                     root.style.setProperty(key, value);
                 }
             });
+            nextTick(() => {
+                updateTopUiHeight()
+            })
         }
     }
 
@@ -1200,7 +1216,7 @@ onMounted(() => {
     min-height: 72px;
     box-sizing: border-box;
     display: flex;
-    align-items: center;
+    align-items: end;
     z-index: 10;
     padding: 0 16px 12px;
     border-bottom: 1.5px solid rgba(5, 217, 232, 0.2);

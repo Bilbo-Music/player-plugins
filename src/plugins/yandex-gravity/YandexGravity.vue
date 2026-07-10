@@ -13,7 +13,7 @@
         ></canvas>
 
         <!-- TOP PANEL: Yandex Music style header with plugin spacer -->
-        <div class="ui-panel top-panel">
+        <div ref="topPanelRef" class="ui-panel top-panel">
             <div class="track-card">
                 <div class="track-cover" :class="{ 'is-loading': !isCoverLoaded }">
                     <img 
@@ -127,7 +127,7 @@
 
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { playerSdk } from '@bilbomusic/player-plugin-sdk'
 
 // -----------------------------------------------------------------
@@ -136,6 +136,7 @@ import { playerSdk } from '@bilbomusic/player-plugin-sdk'
 const canvasRef = ref(null)
 const minimapRef = ref(null)
 const minimapCanvasRef = ref(null)
+const topPanelRef = ref(null)
 
 const theme = ref('dark')
 const isExpanded = ref(true)
@@ -157,9 +158,15 @@ const trackInfo = ref({
     wave: []
 })
 
-const TOP_UI_HEIGHT = 90
+const TOP_UI_HEIGHT = ref(90)
 const BOTTOM_UI_HEIGHT = 130
 const SYNC_THRESHOLD = 1000
+
+const updateTopUiHeight = () => {
+    if (topPanelRef.value) {
+        TOP_UI_HEIGHT.value = topPanelRef.value.offsetHeight || 90
+    }
+}
 
 // Physics and generator parameters for elements
 let currentTime = 0
@@ -191,6 +198,7 @@ const initCanvas = () => {
             ringPos.targetX = canvas.width / 2
             ringPos.targetY = canvas.height / 2 + 15
         }
+        updateTopUiHeight()
     }
     handleCanvasResize()
     window.addEventListener('resize', handleCanvasResize)
@@ -223,6 +231,9 @@ onMounted(() => {
     initCanvas()
     initMinimap()
     startLoop()
+    nextTick(() => {
+        updateTopUiHeight()
+    })
 })
 
 onBeforeUnmount(() => {
@@ -266,6 +277,9 @@ const onInit = (state) => {
                 root.style.setProperty(key, value);
             }
         });
+        nextTick(() => {
+            updateTopUiHeight()
+        })
     }
 }
 
@@ -360,7 +374,7 @@ const handleGravityStart = (e) => {
     const x = clientX - rect.left
     const y = clientY - rect.top
     
-    if (y > canvasRef.value.height - BOTTOM_UI_HEIGHT || y < TOP_UI_HEIGHT) return
+    if (y > canvasRef.value.height - BOTTOM_UI_HEIGHT || y < TOP_UI_HEIGHT.value) return
     
     isDragging = true
     pointerPos.x = x
@@ -773,7 +787,7 @@ const formatNumber = (num) => {
     min-height: 90px;
     box-sizing: border-box; 
     display: flex; 
-    align-items: center; 
+    align-items: end;
     justify-content: space-between;
     padding: 0 24px 12px; 
     z-index: 10; 
@@ -876,12 +890,13 @@ const formatNumber = (num) => {
 .score-panel {
     position: absolute; 
     top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 88px);
-    left: 24px; 
+    left: 16px;
     z-index: 5; 
     pointer-events: none;
     font-family: monospace; 
     font-size: 12px; 
     font-weight: 700;
+    padding: 12px 8px;
 }
 
 .dark .score-panel { 

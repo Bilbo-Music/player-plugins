@@ -1,7 +1,7 @@
 <template>
     <div class="lofi-container" :class="[theme]" id="lofi-app-container">
         <!-- COZY TRACK HEADER PANEL -->
-        <div class="lofi-top-panel" id="lofi-top-panel">
+        <div ref="topPanelRef" class="lofi-top-panel" id="lofi-top-panel">
             <div class="lofi-track-card" id="lofi-track-card">
                 <div class="lofi-cover-wrapper" id="lofi-cover-wrapper">
                     <img
@@ -57,10 +57,18 @@
                 </div>
 
                 <div class="cozy-slider-group" id="lofi-bobbing-adjust">
-                    <span class="cozy-label">HEAD-BOB INTENSITY</span>
+                    <span class="cozy-label">LO-FI BEAT REACTOR</span>
                     <div class="slider-container">
-                        <input type="range" min="0" max="2" step="0.1" v-model.number="headBobIntensity" class="cozy-slider" />
+                        <input type="range" min="0" max="2.0" step="0.1" v-model.number="headBobIntensity" class="cozy-slider" />
                         <span class="slider-val">{{ Math.round(headBobIntensity * 100) }}%</span>
+                    </div>
+                </div>
+
+                <div class="cozy-slider-group" id="lofi-lava-adjust">
+                    <span class="cozy-label">LAVA LAMP ACTIVITY</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="2.0" step="0.1" v-model.number="lavaLampGlow" class="cozy-slider" />
+                        <span class="slider-val">{{ Math.round(lavaLampGlow * 100) }}%</span>
                     </div>
                 </div>
 
@@ -119,17 +127,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, reactive } from 'vue'
+import { ref, onMounted, onBeforeUnmount, reactive, nextTick } from 'vue'
 import { playerSdk } from '@bilbomusic/player-plugin-sdk'
 
 const canvasRef = ref(null)
 const viewportRef = ref(null)
+const topPanelRef = ref(null)
 const theme = ref('dark')
 const isExpanded = ref(true)
 const playerState = ref('paused')
 const reaction = ref('')
 const repeat = ref('none')
 const isCoverLoaded = ref(false)
+
+const TOP_UI_HEIGHT = ref(80)
+
+const updateTopUiHeight = () => {
+    if (topPanelRef.value) {
+        TOP_UI_HEIGHT.value = topPanelRef.value.offsetHeight || 80
+    }
+}
 
 const nextDisabled = ref(false)
 const prevDisabled = ref(true)
@@ -147,8 +164,61 @@ const trackInfo = ref({
 const activeWeather = ref('rain') // rain, snow, stars
 const currentPalette = ref('midnight-study')
 const lampGlowMultiplier = ref(1.0)
+const lavaLampGlow = ref(1.0)
 const headBobIntensity = ref(1.0)
 const clickSplashText = ref('')
+
+const catReactTimer = ref(0)
+const catTargetX = ref(0)
+const catTargetY = ref(0)
+
+const getTrackBpm = () => {
+    if (trackInfo.value.bpm) return trackInfo.value.bpm
+    if (trackInfo.value.tempo) return trackInfo.value.tempo
+    // Deterministic BPM based on track title
+    const title = trackInfo.value.title || 'Lofi Chills'
+    let hash = 0
+    for (let i = 0; i < title.length; i++) {
+        hash = title.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    return 68 + (Math.abs(hash) % 21) // 68 to 88 BPM
+}
+
+const getBassPulse = () => {
+    const isPlaying = playerState.value === 'playing'
+    if (!isPlaying) return 0
+    // Lofi beat pulse fallback
+    const bpm = getTrackBpm()
+    const beatDuration = 60000 / bpm
+    const progress = (Date.now() % beatDuration) / beatDuration
+    const beatPulse = Math.max(0, Math.pow(1 - progress, 2.5))
+    // Blend real audio bass (if available) with our cozy synthetic beat pulse
+    return (audioData.bass * 0.6 + beatPulse * 0.4)
+}
+
+const getGirlBob = () => {
+    const isPlaying = playerState.value === 'playing'
+    if (!isPlaying) {
+        return Math.sin(Date.now() * 0.0016) * 1.8 * headBobIntensity.value
+    }
+    const bpm = getTrackBpm()
+    const beatDuration = 60000 / bpm
+    const phase = (Date.now() % beatDuration) / beatDuration
+    // Elegant rhythmic head-bob curve that syncs with the beat
+    const baseBob = Math.sin(phase * Math.PI * 2) * 12.0
+    // Mix in some dynamic bass reactivity to make it feel organic
+    return baseBob * (0.8 + audioData.bass * 0.5) * headBobIntensity.value
+}
+
+const getGirlTilt = () => {
+    const isPlaying = playerState.value === 'playing'
+    if (!isPlaying) return 0
+    const bpm = getTrackBpm()
+    const beatDuration = 60000 / bpm
+    const phase = (Date.now() % beatDuration) / beatDuration
+    // Tilt left/right on every beat
+    return Math.cos(phase * Math.PI * 2) * 0.06 * (0.8 + audioData.bass * 0.5) * headBobIntensity.value
+}
 
 const palettes = {
     'midnight-study': {
@@ -247,11 +317,63 @@ const handleInteraction = (e) => {
     const px = e.clientX - rect.left
     const py = e.clientY - rect.top
 
-    // Spawn visual music notes on pointer click/tap
-    const expressions = ['Sip Lofi Coffee', 'Cat purrs...', 'Vinyl crackles...', 'Cozy rain vibe', 'Cozy beats active']
-    clickSplashText.value = expressions[Math.floor(Math.random() * expressions.length)]
-    clickBubbleTimer = 120
+    const w = canvasRef.value.width
+    const h = canvasRef.value.height
+    let scale, offsetX, offsetY, vH
+    if (w / h > 800 / 500) {
+        scale = h / 500
+        offsetX = (w - 800 * scale) / 2
+        offsetY = 0
+        vH = 500
+    } else {
+        scale = w / 800
+        offsetX = 0
+        const targetVH = h / scale
+        if (targetVH > 515) {
+            vH = 515
+            offsetY = (h - 515 * scale) / 2
+        } else {
+            vH = targetVH
+            offsetY = 0
+        }
+    }
+    
+    const virtualX = (px - offsetX) / scale
+    const virtualY = (py - offsetY) / scale
+    
+    const tableY = 330
+    let customText = ''
+    
+    // Hit testing for interactive room elements
+    if (Math.hypot(virtualX - 175, virtualY - (tableY - 12)) < 35) {
+        customText = 'Purrr... Soft kitty sleeps.'
+    } else if (Math.hypot(virtualX - 212, virtualY - (tableY + 87)) < 55) {
+        togglePlay()
+        customText = playerState.value !== 'playing' ? 'Vinyl crackles... Music on!' : 'Music paused.'
+    } else if (vH >= 515 && Math.hypot(virtualX - 135, virtualY - (tableY + 140)) < 35) {
+        customText = 'Shiba snoozes cozy...'
+    } else if (Math.hypot(virtualX - 330, virtualY - (tableY + 110)) < 25) {
+        customText = 'Warm scent of lavender...'
+    } else if (Math.hypot(virtualX - 345, virtualY - (tableY + 28)) < 20) {
+        customText = 'A warm sip of freshly brewed coffee.'
+    } else if (Math.hypot(virtualX - 399, virtualY - (tableY + 31)) < 35) {
+        customText = 'Focus beats... Study mode active.'
+    } else if (Math.hypot(virtualX - 712, virtualY - (tableY + 87)) < 35) {
+        customText = 'Lava lamp pulses with cozy retro energy!'
+    } else {
+        const expressions = ['Sip Lofi Coffee', 'Cat purrs...', 'Vinyl crackles...', 'Cozy rain vibe', 'Cozy beats active']
+        customText = expressions[Math.floor(Math.random() * expressions.length)]
+    }
+    
+    clickSplashText.value = customText
+    clickBubbleTimer = 2500 // 2.5 seconds to read without glitchy disappearing
 
+    // Trigger cat to stand up alert and look toward the click
+    catTargetX.value = virtualX
+    catTargetY.value = virtualY
+    catReactTimer.value = 150 // Alert for ~150 frames (approx 2.5s)
+
+    // Spawn visual music notes on pointer click/tap
     for (let i = 0; i < 8; i++) {
         const angle = Math.random() * Math.PI * 2
         const speed = 1.0 + Math.random() * 3.0
@@ -282,13 +404,13 @@ const updateEnvironment = (dt, w, h) => {
 
     // 1. Tape reels spinning
     if (isPlaying) {
-        tapeReelsAngle += 0.05 * (1 + audioData.bass * 1.5) * timeScale
+        tapeReelsAngle += 0.05 * (1 + getBassPulse() * 1.5) * timeScale
     }
 
     // 2. Head-bobbing & kitty breathing
-    const bobFreq = isPlaying ? (0.08 + audioData.bass * 0.05) : 0.03
-    catBreatheScale = 1 + Math.sin(Date.now() * 0.002) * 0.03 + (isPlaying ? audioData.bass * 0.02 : 0)
-    catTailAngle = Math.sin(Date.now() * 0.002) * 0.3 + (isPlaying ? Math.sin(Date.now() * 0.008) * audioData.bass * 0.5 : 0)
+    const bobFreq = isPlaying ? (0.08 + getBassPulse() * 0.05) : 0.03
+    catBreatheScale = 1 + Math.sin(Date.now() * 0.002) * 0.03 + (isPlaying ? getBassPulse() * 0.08 * headBobIntensity.value : 0)
+    catTailAngle = Math.sin(Date.now() * 0.002) * 0.3 + (isPlaying ? Math.sin(Date.now() * 0.012) * getBassPulse() * 1.5 * headBobIntensity.value : 0)
 
     // 3. Sky Clouds
     skyClouds.forEach(cloud => {
@@ -352,6 +474,11 @@ const updateEnvironment = (dt, w, h) => {
         })
     }
 
+    // Decrement cat react timer
+    if (catReactTimer.value > 0) {
+        catReactTimer.value -= timeScale
+    }
+
     // Decrement click bubble timer
     if (clickBubbleTimer > 0) {
         clickBubbleTimer -= dt
@@ -371,28 +498,41 @@ const drawLofiScene = (ctx, w, h) => {
     ctx.fillStyle = palette.wallShadow
     ctx.fillRect(0, 0, w, h)
 
-    // 1. CHOP-FREE SCALE ENGINE: Scale canvas uniformly to fit a virtual 800x500 design coordinate space
+    // 1. CHOP-FREE SCALE ENGINE: Scale canvas uniformly to fit a virtual coordinate space
     ctx.save()
-    const scaleX = w / 800
-    const scaleY = h / 500
-    const scale = Math.min(scaleX, scaleY)
-    const offsetX = (w - 800 * scale) / 2
-    const offsetY = (h - 500 * scale) / 2
+    let scale, offsetX, offsetY, vW, vH
+    if (w / h > 800 / 500) {
+        // Wide screen: fit height, extend width
+        scale = h / 500
+        offsetX = (w - 800 * scale) / 2
+        offsetY = 0
+        vW = w / scale
+        vH = 500
+    } else {
+        // Tall screen: fit width, cap virtual height to 515, and center room vertically
+        scale = w / 800
+        offsetX = 0
+        const targetVH = h / scale
+        if (targetVH > 515) {
+            vH = 515
+            offsetY = (h - 515 * scale) / 2
+        } else {
+            vH = targetVH
+            offsetY = 0
+        }
+        vW = 800
+    }
     
     ctx.translate(offsetX, offsetY)
     ctx.scale(scale, scale)
 
-    // Virtual coords: Canvas is now guaranteed 800 x 500
-    const vW = 800
-    const vH = 500
-
     // 2. SKY & WINDOW BACKDROP
-    // Large atmospheric window centered at top
-    const winX = 100
-    const winY = 40
-    const winW = 600
-    const winH = 260
-    const deskY = winY + winH // y = 300
+    // Large atmospheric window centered at top, made taller and wider to fill black space!
+    const winX = 40
+    const winY = 10
+    const winW = 720
+    const winH = 315
+    const tableY = winY + winH + 5 // y = 330
 
     ctx.save()
     // Clip window area so nothing spills into room walls
@@ -643,9 +783,8 @@ const drawLofiScene = (ctx, w, h) => {
     ctx.fillRect(0, 0, vW, vH)
 
     // 7. DESK & TABLE BACKGROUND FLOOR
-    // Table level is at y = 300, extends to y = 500
-    const tableY = 300
-    const tableH = 200
+    // Table level is at tableY, extends to the bottom of the canvas vH
+    const tableH = vH - tableY
 
     // Wood tabletop linear gradient
     const deskGrad = ctx.createLinearGradient(0, tableY, 0, tableY + tableH)
@@ -781,7 +920,7 @@ const drawLofiScene = (ctx, w, h) => {
 
     // 10. SPLENDID SLEEPING CAT ON WINDOW CUSHION
     const cushionX = 175
-    const cushionY = 296
+    const cushionY = tableY - 4
     const cushionW = 75
     const cushionH = 14
 
@@ -811,103 +950,216 @@ const drawLofiScene = (ctx, w, h) => {
     }
     ctx.stroke()
 
-    // Sleeping Fluffy Tabby Cat sitting on cushion
-    // Center coordinates of cat
+    // Fluffy Tabby Cat sitting on cushion - with animated standing alert state!
     const catCX = cushionX
     const catCY = cushionY - 8
-    
-    ctx.save()
-    ctx.translate(catCX, catCY)
-    // Slow breathing scale
-    ctx.scale(catBreatheScale, catBreatheScale)
+    const isCatAlert = catReactTimer.value > 0
 
-    // Fluffy tail
-    ctx.save()
-    ctx.translate(16, 2)
-    ctx.rotate(catTailAngle)
-    ctx.fillStyle = currentPalette.value === 'sunset-cozy' ? '#d97d52' : '#ebedf0'
-    ctx.strokeStyle = palette.wallShadow
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.ellipse(8, -2, 12, 5, 0.2, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.stroke()
-    // Tail ginger stripes
-    if (currentPalette.value === 'sunset-cozy') {
-        ctx.strokeStyle = '#a84c20'
-        ctx.beginPath()
-        ctx.moveTo(8, -4); ctx.lineTo(8, 0)
-        ctx.moveTo(12, -3); ctx.lineTo(12, 0)
-        ctx.stroke()
-    }
-    ctx.restore()
-
-    // Fluffy curled body
-    ctx.fillStyle = currentPalette.value === 'sunset-cozy' ? '#f09267' : '#ffffff'
-    ctx.strokeStyle = palette.wallShadow
-    ctx.lineWidth = 2.5
-    ctx.beginPath()
-    ctx.ellipse(0, 0, 22, 13, 0, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.stroke()
-
-    // Cat Head
-    const catHX = -14
-    const catHY = -8
-    ctx.beginPath()
-    ctx.arc(catHX, catHY, 10, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.stroke()
-
-    // Sleeping face curves
-    ctx.strokeStyle = '#4a3b32'
-    ctx.lineWidth = 1.2
-    ctx.beginPath()
-    // Sleeping eyes
-    ctx.arc(catHX - 4, catHY - 1, 1.5, 0, Math.PI, false)
-    ctx.arc(catHX + 1, catHY - 1, 1.5, 0, Math.PI, false)
-    ctx.stroke()
-    // Whisker lines
-    ctx.beginPath()
-    ctx.moveTo(catHX - 9, catHY + 2); ctx.lineTo(catHX - 14, catHY + 1)
-    ctx.moveTo(catHX - 9, catHY + 4); ctx.lineTo(catHX - 13, catHY + 4)
-    ctx.moveTo(catHX + 5, catHY + 2); ctx.lineTo(catHX + 10, catHY + 1)
-    ctx.moveTo(catHX + 5, catHY + 4); ctx.lineTo(catHX + 9, catHY + 4)
-    ctx.stroke()
-
-    // Cute fluffy ears
-    ctx.fillStyle = currentPalette.value === 'sunset-cozy' ? '#d97d52' : '#ffd6db' // Pink inner ear
-    ctx.beginPath()
-    ctx.moveTo(catHX - 8, catHY - 8)
-    ctx.lineTo(catHX - 6, catHY - 16)
-    ctx.lineTo(catHX - 1, catHY - 10)
-    ctx.closePath()
-    ctx.fill()
-    ctx.stroke()
-
-    ctx.beginPath()
-    ctx.moveTo(catHX + 1, catHY - 9)
-    ctx.lineTo(catHX + 4, catHY - 17)
-    ctx.lineTo(catHX + 8, catHY - 9)
-    ctx.closePath()
-    ctx.fill()
-    ctx.stroke()
-
-    ctx.restore() // End Cat breathing transform
-
-    // Cat floating cute "Zzz" bubble letters when playing music
-    if (isPlaying) {
-        const zTick = (Date.now() % 3500) / 3500
-        const zY = catCY - 22 - zTick * 30
-        const zX = catCX - 12 + Math.sin(zY * 0.1) * 6
-        const zAlpha = 1 - zTick
+    if (isCatAlert) {
+        // Calculate transition interpolation (t from 0 to 1) for stand-up and sit-down phases
+        let t = 1.0
+        if (catReactTimer.value > 135) {
+            t = (150 - catReactTimer.value) / 15
+        } else if (catReactTimer.value < 15) {
+            t = catReactTimer.value / 15
+        }
+        
         ctx.save()
-        ctx.fillStyle = `rgba(255, 230, 200, ${zAlpha})`
-        ctx.font = 'bold 11px "Courier New", monospace'
-        ctx.fillText('z', zX, zY)
-        ctx.font = 'bold 13px "Courier New", monospace'
-        ctx.fillText('Z', zX + 8, zY - 8)
+        ctx.translate(catCX, catCY + (1 - t) * 8) // Smooth vertical translation
+        
+        const lookDir = catTargetX.value > catCX ? 1 : -1
+
+        // 1. Alert fast-waving tail
+        ctx.save()
+        ctx.translate(lookDir * -6, 4)
+        const tailWave = Math.sin(Date.now() * 0.03) * 0.45
+        ctx.rotate((lookDir * -0.7) + tailWave)
+        ctx.fillStyle = currentPalette.value === 'sunset-cozy' ? '#d97d52' : '#ebedf0'
+        ctx.strokeStyle = palette.wallShadow
+        ctx.lineWidth = 2.2
+        ctx.beginPath()
+        ctx.ellipse(-6, -12, 14, 4.5, 1.1, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
         ctx.restore()
+
+        // 2. Hind Feet resting on cushion
+        ctx.fillStyle = currentPalette.value === 'sunset-cozy' ? '#d97d52' : '#ebedf0'
+        ctx.strokeStyle = palette.wallShadow
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.ellipse(-8, 8, 6, 3, 0, 0, Math.PI * 2)
+        ctx.ellipse(8, 8, 6, 3, 0, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+
+        // 3. Torso standing upright (capsule/ellipse)
+        ctx.fillStyle = currentPalette.value === 'sunset-cozy' ? '#f09267' : '#ffffff'
+        ctx.strokeStyle = palette.wallShadow
+        ctx.lineWidth = 2.5
+        ctx.beginPath()
+        ctx.ellipse(0, -6 * t, 12, 16 * t + 2, 0, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+
+        // 4. Alert raised front paws
+        ctx.fillStyle = currentPalette.value === 'sunset-cozy' ? '#f09267' : '#ffffff'
+        ctx.beginPath()
+        ctx.arc(-8, -10 * t, 3.5, 0, Math.PI * 2)
+        ctx.arc(8, -10 * t, 3.5, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+
+        // 5. Head placed higher up
+        const headY = -24 * t
+        ctx.beginPath()
+        ctx.arc(0, headY, 10.5, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+
+        // 6. Alert pointed ears
+        ctx.fillStyle = currentPalette.value === 'sunset-cozy' ? '#d97d52' : '#ffd6db'
+        ctx.beginPath()
+        ctx.moveTo(-8, headY - 7)
+        ctx.lineTo(-7, headY - 16)
+        ctx.lineTo(-2, headY - 9)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.beginPath()
+        ctx.moveTo(2, headY - 9)
+        ctx.lineTo(7, headY - 16)
+        ctx.lineTo(8, headY - 7)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+
+        // 7. Wide open alert eyes looking at click point!
+        const eyeOffset = lookDir * 2
+        ctx.fillStyle = '#1e1b18'
+        ctx.beginPath()
+        ctx.arc(-4.5 + eyeOffset, headY - 2.2, 2.2, 0, Math.PI * 2)
+        ctx.arc(3.5 + eyeOffset, headY - 2.2, 2.2, 0, Math.PI * 2)
+        ctx.fill()
+        // Specular highlight highlight in eye
+        ctx.fillStyle = '#ffffff'
+        ctx.beginPath()
+        ctx.arc(-4.5 + eyeOffset - 0.6, headY - 2.8, 0.7, 0, Math.PI * 2)
+        ctx.arc(3.5 + eyeOffset - 0.6, headY - 2.8, 0.7, 0, Math.PI * 2)
+        ctx.fill()
+
+        // Whisker and tiny nose
+        ctx.fillStyle = '#ffb3c1'
+        ctx.beginPath()
+        ctx.arc(lookDir, headY + 1.2, 1.2, 0, Math.PI * 2)
+        ctx.fill()
+
+        ctx.strokeStyle = '#4a3b32'
+        ctx.lineWidth = 1.0
+        ctx.beginPath()
+        ctx.moveTo(-6 + lookDir, headY + 3.2); ctx.lineTo(-12 + lookDir, headY + 2.2)
+        ctx.moveTo(-6 + lookDir, headY + 5.2); ctx.lineTo(-11 + lookDir, headY + 5.2)
+        ctx.moveTo(6 + lookDir, headY + 3.2); ctx.lineTo(12 + lookDir, headY + 2.2)
+        ctx.moveTo(6 + lookDir, headY + 5.2); ctx.lineTo(11 + lookDir, headY + 5.2)
+        ctx.stroke()
+
+        ctx.restore()
+    } else {
+        // Normal Sleeping Fluffy Tabby Cat sitting on cushion
+        ctx.save()
+        ctx.translate(catCX, catCY)
+        // Slow breathing scale
+        ctx.scale(catBreatheScale, catBreatheScale)
+
+        // Fluffy tail
+        ctx.save()
+        ctx.translate(16, 2)
+        ctx.rotate(catTailAngle)
+        ctx.fillStyle = currentPalette.value === 'sunset-cozy' ? '#d97d52' : '#ebedf0'
+        ctx.strokeStyle = palette.wallShadow
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.ellipse(8, -2, 12, 5, 0.2, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+        // Tail ginger stripes
+        if (currentPalette.value === 'sunset-cozy') {
+            ctx.strokeStyle = '#a84c20'
+            ctx.beginPath()
+            ctx.moveTo(8, -4); ctx.lineTo(8, 0)
+            ctx.moveTo(12, -3); ctx.lineTo(12, 0)
+            ctx.stroke()
+        }
+        ctx.restore()
+
+        // Fluffy curled body
+        ctx.fillStyle = currentPalette.value === 'sunset-cozy' ? '#f09267' : '#ffffff'
+        ctx.strokeStyle = palette.wallShadow
+        ctx.lineWidth = 2.5
+        ctx.beginPath()
+        ctx.ellipse(0, 0, 22, 13, 0, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+
+        // Cat Head
+        const catHX = -14
+        const catHY = -8
+        ctx.beginPath()
+        ctx.arc(catHX, catHY, 10, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+
+        // Sleeping face curves
+        ctx.strokeStyle = '#4a3b32'
+        ctx.lineWidth = 1.2
+        ctx.beginPath()
+        // Sleeping eyes
+        ctx.arc(catHX - 4, catHY - 1, 1.5, 0, Math.PI, false)
+        ctx.arc(catHX + 1, catHY - 1, 1.5, 0, Math.PI, false)
+        ctx.stroke()
+        // Whisker lines
+        ctx.beginPath()
+        ctx.moveTo(catHX - 9, catHY + 2); ctx.lineTo(catHX - 14, catHY + 1)
+        ctx.moveTo(catHX - 9, catHY + 4); ctx.lineTo(catHX - 13, catHY + 4)
+        ctx.moveTo(catHX + 5, catHY + 2); ctx.lineTo(catHX + 10, catHY + 1)
+        ctx.moveTo(catHX + 5, catHY + 4); ctx.lineTo(catHX + 9, catHY + 4)
+        ctx.stroke()
+
+        // Cute fluffy ears
+        ctx.fillStyle = currentPalette.value === 'sunset-cozy' ? '#d97d52' : '#ffd6db' // Pink inner ear
+        ctx.beginPath()
+        ctx.moveTo(catHX - 8, catHY - 8)
+        ctx.lineTo(catHX - 6, catHY - 16)
+        ctx.lineTo(catHX - 1, catHY - 10)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.beginPath()
+        ctx.moveTo(catHX + 1, catHY - 9)
+        ctx.lineTo(catHX + 4, catHY - 17)
+        ctx.lineTo(catHX + 8, catHY - 9)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.restore() // End Cat breathing transform
+
+        // Cat floating cute "Zzz" bubble letters when playing music
+        if (isPlaying) {
+            const zTick = (Date.now() % 3500) / 3500
+            const zY = catCY - 22 - zTick * 30
+            const zX = catCX - 12 + Math.sin(zY * 0.1) * 6
+            const zAlpha = 1 - zTick
+            ctx.save()
+            ctx.fillStyle = `rgba(255, 230, 200, ${zAlpha})`
+            ctx.font = 'bold 11px "Courier New", monospace'
+            ctx.fillText('z', zX, zY)
+            ctx.font = 'bold 13px "Courier New", monospace'
+            ctx.fillText('Z', zX + 8, zY - 8)
+            ctx.restore()
+        }
     }
 
     ctx.restore() // End cushion/cat drawer
@@ -915,7 +1167,7 @@ const drawLofiScene = (ctx, w, h) => {
     // 11. REVERSED MASTERPIECE RECORD PLAYER (ON DESK)
     // Base located around x = 200, y = 350, w = 150, h = 80
     const rPlayX = 140
-    const rPlayY = 345
+    const rPlayY = tableY + 45
     const rPlayW = 145
     const rPlayH = 85
 
@@ -958,7 +1210,7 @@ const drawLofiScene = (ctx, w, h) => {
     const equalizerY = rPlayY + rPlayH - 6
     
     for (let b = 0; b < barCount; b++) {
-        const audioScale = b < 3 ? audioData.bass : b < 7 ? audioData.mid : audioData.high
+        const audioScale = b < 3 ? getBassPulse() : b < 7 ? (audioData.mid > 0 ? audioData.mid : getBassPulse() * 0.7) : (audioData.high > 0 ? audioData.high : getBassPulse() * 0.4)
         const randBounce = isPlaying ? (audioScale * 18 * (0.6 + Math.sin(b + Date.now() * 0.01) * 0.4)) : 1.5
         const barH = Math.max(2, Math.min(18, randBounce))
         
@@ -1053,10 +1305,10 @@ const drawLofiScene = (ctx, w, h) => {
     // 12. HIGH-POLISHED STUDYING ANIME CHARACTER (LOFI STUDENT)
     // Proportional vector shape sitting centered at design x = 490, y = 300 (desk line)
     const girlX = 490
-    const girlY = tableY + 5 // y = 305
+    const girlY = tableY + 5 // y = 325
 
-    // Interactive head-bob factor syncing with bass/mids or slow breathing when paused
-    const bobVal = isPlaying ? (audioData.bass * 16 * headBobIntensity.value) : Math.sin(Date.now() * 0.0016) * 1.8
+    // Interactive head-bob factor syncing with the track's BPM and bass beat
+    const bobVal = getGirlBob()
     // Soft diagonal sway breathing offset
     const breatheOffset = Math.sin(Date.now() * 0.002) * 1.0
 
@@ -1141,6 +1393,43 @@ const drawLofiScene = (ctx, w, h) => {
     ctx.stroke()
     ctx.restore()
 
+    // Cute glowing mechanical keyboard on table
+    const kbX = -45
+    const kbY = 24
+    const kbW = 74
+    const kbH = 14
+
+    ctx.save()
+    // Keyboard base chassis
+    ctx.fillStyle = '#1e1b29'
+    ctx.strokeStyle = palette.wallShadow
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.roundRect(kbX, kbY, kbW, kbH, 3)
+    ctx.fill()
+    ctx.stroke()
+
+    // Keycaps with neon backlit glow pulsing with the music!
+    const rows = 3
+    const cols = 10
+    const keyW = (kbW - 6) / cols
+    const keyH = (kbH - 4) / rows
+    const pulse = getBassPulse()
+    
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const kx = kbX + 3 + c * keyW
+            const ky = kbY + 2 + r * keyH
+            
+            // Backlight color cycle
+            const hue = (c * 25 + Date.now() * 0.08) % 360
+            const glowAlpha = 0.5 + pulse * 0.5
+            ctx.fillStyle = `hsla(${hue}, 85%, 65%, ${glowAlpha})`
+            ctx.fillRect(kx + 0.5, ky + 0.5, keyW - 1, keyH - 1)
+        }
+    }
+    ctx.restore()
+
     // WRITING LEFT ARM & ELBOW (Leaning resting flat on tabletop)
     ctx.fillStyle = palette.sweater
     ctx.beginPath()
@@ -1181,7 +1470,9 @@ const drawLofiScene = (ctx, w, h) => {
     // Dynamic bobbing head frame!
     ctx.save()
     // Apply head-bob translation (Head tilts and nods up/down)
-    ctx.translate(bobVal * 0.18, -26 + bobVal * 0.5)
+    ctx.translate(bobVal * 0.22, -26 + bobVal * 0.65)
+    const tiltAngle = getGirlTilt()
+    ctx.rotate(tiltAngle)
 
     // Long flowing brown hair backdrop
     ctx.fillStyle = palette.hair
@@ -1270,9 +1561,9 @@ const drawLofiScene = (ctx, w, h) => {
     ctx.restore() // End Character translation
 
     // 13. RETRO ANGLED DESK LAMP PROJECTING SHINY SPOTLIGHT CONE
-    // Lamp position coordinates: base at x = 580, y = 310
+    // Lamp position coordinates: base at x = 585, y = tableY + 20
     const lampBaseX = 585
-    const lampBaseY = 320
+    const lampBaseY = tableY + 20
 
     ctx.save()
     // Wooden / Metal base of the lamp
@@ -1337,7 +1628,7 @@ const drawLofiScene = (ctx, w, h) => {
     ctx.globalCompositeOperation = 'screen'
     
     const spotGrad = ctx.createRadialGradient(sOriginX, sOriginY, 5, sOriginX + 50, sOriginY + 140, 200)
-    const lampIntensity = Math.min(2.0, Math.max(0.1, lampGlowMultiplier.value))
+    const lampIntensity = Math.min(2.2, Math.max(0.1, lampGlowMultiplier.value * (1 + (isPlaying ? audioData.bass * 0.75 * headBobIntensity.value : 0))))
     spotGrad.addColorStop(0, `rgba(255, 230, 160, ${0.45 * lampIntensity})`)
     spotGrad.addColorStop(0.4, `rgba(255, 190, 100, ${0.2 * lampIntensity})`)
     spotGrad.addColorStop(0.8, `rgba(255, 140, 50, ${0.03 * lampIntensity})`)
@@ -1356,7 +1647,7 @@ const drawLofiScene = (ctx, w, h) => {
 
     // 14. STEAMING PORCELAIN MUG OF COFFEE (ON DESK)
     const mugCX = 345
-    const mugCY = 328
+    const mugCY = tableY + 22
 
     ctx.save()
     // Cute handle
@@ -1403,6 +1694,378 @@ const drawLofiScene = (ctx, w, h) => {
         )
         ctx.stroke()
     }
+    ctx.restore()
+
+    // 14A. COZY FLICKERING SCENTED CANDLE
+    const candleX = 330
+    const candleY = tableY + 110
+    ctx.save()
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.25)'
+    ctx.beginPath()
+    ctx.ellipse(candleX, candleY + 22, 10, 3, 0, 0, Math.PI * 2)
+    ctx.fill()
+    
+    // Glass jar
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'
+    ctx.strokeStyle = palette.wallShadow
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.roundRect(candleX - 10, candleY, 20, 22, 3)
+    ctx.fill()
+    ctx.stroke()
+    
+    // Wax inside
+    ctx.fillStyle = currentPalette.value === 'sunset-cozy' ? '#ffd6db' : '#e2e8f0'
+    ctx.beginPath()
+    ctx.roundRect(candleX - 8, candleY + 6, 16, 14, 2)
+    ctx.fill()
+    
+    // Wick
+    ctx.strokeStyle = '#475569'
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.moveTo(candleX, candleY + 6)
+    ctx.lineTo(candleX, candleY + 1)
+    ctx.stroke()
+    
+    // Flickering flame (reacts to music high/mid frequency pulse!)
+    const flamePulse = 1 + (isPlaying ? audioData.high * 0.5 + Math.sin(Date.now() * 0.02) * 0.15 : Math.sin(Date.now() * 0.008) * 0.1)
+    const flameH = 10 * flamePulse
+    const flameW = 5 * (0.85 + Math.sin(Date.now() * 0.015) * 0.1)
+    
+    ctx.save()
+    ctx.globalCompositeOperation = 'screen'
+    // Outer flame glow
+    const flameGlow = ctx.createRadialGradient(candleX, candleY - 3, 1, candleX, candleY - 3, 15 * flamePulse)
+    flameGlow.addColorStop(0, '#ff9e2c')
+    flameGlow.addColorStop(0.5, 'rgba(255, 117, 151, 0.15)')
+    flameGlow.addColorStop(1, 'rgba(0,0,0,0)')
+    ctx.fillStyle = flameGlow
+    ctx.beginPath()
+    ctx.arc(candleX, candleY - 3, 15 * flamePulse, 0, Math.PI * 2)
+    ctx.fill()
+    
+    // Inner blue-orange flame core
+    ctx.fillStyle = '#ffeedb'
+    ctx.beginPath()
+    ctx.moveTo(candleX, candleY - 1 - flameH)
+    ctx.bezierCurveTo(candleX - flameW, candleY - 1 - flameH * 0.3, candleX - flameW, candleY - 1, candleX, candleY - 1)
+    ctx.bezierCurveTo(candleX + flameW, candleY - 1, candleX + flameW, candleY - 1 - flameH * 0.3, candleX, candleY - 1 - flameH)
+    ctx.closePath()
+    ctx.fill()
+    ctx.restore()
+    ctx.restore()
+
+    // 14B. COZY PLATE OF COOKIES
+    const cookieX = 245
+    const cookieY = tableY + 115
+    ctx.save()
+    // Plate shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.2)'
+    ctx.beginPath()
+    ctx.ellipse(cookieX, cookieY + 6, 28, 8, 0, 0, Math.PI * 2)
+    ctx.fill()
+    
+    // Plate
+    ctx.fillStyle = currentPalette.value === 'forest-cabin' ? '#ebd9c8' : '#e2e8f0'
+    ctx.strokeStyle = palette.wallShadow
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.ellipse(cookieX, cookieY + 2, 26, 6, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.stroke()
+    
+    // Cookies
+    ctx.fillStyle = '#b47b4c' // light brown cookie dough
+    ctx.strokeStyle = palette.wallShadow
+    ctx.lineWidth = 1.5
+    
+    // Cookie 1
+    ctx.beginPath()
+    ctx.ellipse(cookieX - 8, cookieY + 1, 10, 4, 0.1, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.stroke()
+    // Chocolate chips
+    ctx.fillStyle = '#42240c'
+    ctx.fillRect(cookieX - 11, cookieY, 2, 1.5)
+    ctx.fillRect(cookieX - 6, cookieY - 1, 1.5, 1.5)
+    ctx.fillRect(cookieX - 8, cookieY + 2, 2, 1)
+    
+    // Cookie 2 overlapping
+    ctx.fillStyle = '#b47b4c'
+    ctx.beginPath()
+    ctx.ellipse(cookieX + 6, cookieY + 2, 10, 4, -0.2, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.stroke()
+    // Chips
+    ctx.fillStyle = '#42240c'
+    ctx.fillRect(cookieX + 3, cookieY + 1, 2, 1.5)
+    ctx.fillRect(cookieX + 8, cookieY + 2, 1.5, 1.5)
+    ctx.fillRect(cookieX + 5, cookieY - 1, 2, 1)
+    ctx.restore()
+
+    // 14C. STUDY PLANNER & COLOR PENS
+    const plannerX = 405
+    const plannerY = tableY + 105
+    ctx.save()
+    // Planner shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.2)'
+    ctx.fillRect(plannerX, plannerY + 14, 42, 6)
+    
+    // Planner notepad
+    ctx.fillStyle = '#3b82f6' // Blue notepad
+    ctx.strokeStyle = palette.wallShadow
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.roundRect(plannerX, plannerY, 40, 16, 2)
+    ctx.fill()
+    ctx.stroke()
+    
+    // Grid pages inside
+    ctx.fillStyle = '#ffffff'
+    ctx.beginPath()
+    ctx.roundRect(plannerX + 2, plannerY + 2, 36, 12, 1)
+    ctx.fill()
+    
+    // Faint checklist lines
+    ctx.strokeStyle = '#93c5fd'
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.moveTo(plannerX + 6, plannerY + 5); ctx.lineTo(plannerX + 25, plannerY + 5)
+    ctx.moveTo(plannerX + 6, plannerY + 8); ctx.lineTo(plannerX + 30, plannerY + 8)
+    ctx.moveTo(plannerX + 6, plannerY + 11); ctx.lineTo(plannerX + 22, plannerY + 11)
+    ctx.stroke()
+    
+    // Tiny green checkbox ticks!
+    ctx.fillStyle = '#10b981'
+    ctx.fillRect(plannerX + 30, plannerY + 4, 3, 3)
+    ctx.fillRect(plannerX + 32, plannerY + 10, 3, 3)
+    
+    // Colored markers/pens lying beside planner
+    ctx.strokeStyle = '#ec4899' // Pink pen
+    ctx.lineWidth = 1.8
+    ctx.beginPath()
+    ctx.moveTo(plannerX + 46, plannerY + 4)
+    ctx.lineTo(plannerX + 56, plannerY + 14)
+    ctx.stroke()
+    
+    ctx.strokeStyle = '#06b6d4' // Cyan pen
+    ctx.lineWidth = 1.8
+    ctx.beginPath()
+    ctx.moveTo(plannerX + 50, plannerY + 2)
+    ctx.lineTo(plannerX + 60, plannerY + 12)
+    ctx.stroke()
+    
+    ctx.restore()
+
+    // 14D. COZY SLEEPING SHIBA PUPPY ON RUG (Only drawn when tall space permits!)
+    if (vH >= 515) {
+        const rugX = 135
+        const rugY = tableY + 140
+        ctx.save()
+        
+        // Woven floor rug
+        const rugGrad = ctx.createLinearGradient(rugX - 45, rugY, rugX + 45, rugY)
+        rugGrad.addColorStop(0, '#581c3f')
+        rugGrad.addColorStop(0.5, '#85345a')
+        rugGrad.addColorStop(1, '#581c3f')
+        ctx.fillStyle = rugGrad
+        ctx.strokeStyle = 'rgba(0,0,0,0.15)'
+        ctx.lineWidth = 1.5
+        ctx.beginPath()
+        ctx.ellipse(rugX, rugY, 45, 12, 0, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+        
+        // Rug fringe tassels
+        ctx.strokeStyle = '#ffb3c1'
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        for (let t = -45; t <= 45; t += 15) {
+            ctx.moveTo(rugX + t, rugY - (t % 2 === 0 ? 3 : 1))
+            ctx.lineTo(rugX + t + (t < 0 ? -4 : 4), rugY + (t % 2 === 0 ? 1 : 2))
+        }
+        ctx.stroke()
+        
+        // Sleeping Shiba Puppy
+        ctx.save()
+        ctx.translate(rugX, rugY - 4)
+        const pupBreathe = 1 + Math.sin(Date.now() * 0.0018) * 0.02 + (isPlaying ? getBassPulse() * 0.04 * headBobIntensity.value : 0)
+        ctx.scale(pupBreathe, pupBreathe)
+        
+        // Shiba body (orange-gold)
+        ctx.fillStyle = '#e67e22'
+        ctx.strokeStyle = palette.wallShadow
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.ellipse(4, 2, 18, 11, 0, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+        
+        // Shiba head curled up
+        ctx.beginPath()
+        ctx.arc(-10, -2, 8, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+        
+        // White muzzle & chest fur
+        ctx.fillStyle = '#fff9f0'
+        ctx.beginPath()
+        ctx.arc(-10, 0, 5, 0, Math.PI * 2)
+        ctx.fill()
+        
+        ctx.beginPath()
+        ctx.ellipse(2, 4, 12, 7, 0, 0, Math.PI * 2)
+        ctx.fill()
+        
+        // Shiba cute sleeping curved eyes & nose
+        ctx.strokeStyle = '#4a2c1a'
+        ctx.lineWidth = 1.2
+        ctx.beginPath()
+        ctx.arc(-11, -2, 1.5, 0.2, Math.PI * 0.8, false)
+        ctx.stroke()
+        
+        ctx.fillStyle = '#000000'
+        ctx.beginPath()
+        ctx.arc(-15, 0, 1.2, 0, Math.PI * 2)
+        ctx.fill()
+        
+        // Shiba cute triangles ears
+        ctx.fillStyle = '#d35400'
+        ctx.beginPath()
+        ctx.moveTo(-14, -8)
+        ctx.lineTo(-11, -15)
+        ctx.lineTo(-7, -8)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+        
+        ctx.beginPath()
+        ctx.moveTo(-7, -8)
+        ctx.lineTo(-4, -14)
+        ctx.lineTo(-1, -8)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+        
+        // Curly tail
+        ctx.fillStyle = '#e67e22'
+        ctx.beginPath()
+        ctx.arc(15, -4, 6, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+        ctx.fillStyle = '#fff9f0'
+        ctx.beginPath()
+        ctx.arc(13, -4, 3.5, 0, Math.PI * 2)
+        ctx.fill()
+        
+        ctx.restore()
+        ctx.restore()
+    }
+
+    // 14E. COZY GLOWING LAVA LAMP (ON RIGHT SIDE OF DESK) - SCALED LARGER
+    const lavaX = 712
+    const lavaY = tableY + 45
+    const lavaW = 32
+    const lavaH = 85
+
+    ctx.save()
+    // Base shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.3)'
+    ctx.beginPath()
+    ctx.ellipse(lavaX, lavaY + lavaH, 18, 4.5, 0, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Glow behind the lamp
+    const glowIntensity = lavaLampGlow.value
+    if (glowIntensity > 0.05) {
+        ctx.save()
+        ctx.globalCompositeOperation = 'screen'
+        const lavaGlow = ctx.createRadialGradient(lavaX, lavaY + lavaH/2, 2, lavaX, lavaY + lavaH/2, 55 * glowIntensity)
+        const glowColor = currentPalette.value === 'sunset-cozy' ? 'rgba(255, 85, 51, 0.35)' : currentPalette.value === 'forest-cabin' ? 'rgba(57, 255, 106, 0.3)' : 'rgba(255, 42, 109, 0.35)'
+        lavaGlow.addColorStop(0, glowColor)
+        lavaGlow.addColorStop(1, 'rgba(0,0,0,0)')
+        ctx.fillStyle = lavaGlow
+        ctx.beginPath()
+        ctx.arc(lavaX, lavaY + lavaH/2, 55 * glowIntensity, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.restore()
+    }
+
+    // Metal Base (tapered cone)
+    ctx.fillStyle = '#475569' // Slate metal
+    ctx.strokeStyle = palette.wallShadow
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.moveTo(lavaX - lavaW/2 - 3, lavaY + lavaH)
+    ctx.lineTo(lavaX - lavaW/2 + 3, lavaY + lavaH - 16)
+    ctx.lineTo(lavaX + lavaW/2 - 3, lavaY + lavaH - 16)
+    ctx.lineTo(lavaX + lavaW/2 + 3, lavaY + lavaH)
+    ctx.closePath()
+    ctx.fill()
+    ctx.stroke()
+
+    // Glass Container (rounded column / bottle)
+    ctx.save()
+    ctx.beginPath()
+    ctx.roundRect(lavaX - lavaW/2, lavaY + 10, lavaW, lavaH - 26, 7)
+    ctx.clip()
+
+    // Liquid backdrop gradient
+    const liqGrad = ctx.createLinearGradient(lavaX, lavaY + 10, lavaX, lavaY + lavaH - 16)
+    if (currentPalette.value === 'sunset-cozy') {
+        liqGrad.addColorStop(0, '#5b1c3f')
+        liqGrad.addColorStop(1, '#2d142c')
+    } else if (currentPalette.value === 'forest-cabin') {
+        liqGrad.addColorStop(0, '#071f1a')
+        liqGrad.addColorStop(1, '#121a16')
+    } else {
+        liqGrad.addColorStop(0, '#1a0b2e')
+        liqGrad.addColorStop(1, '#0c051a')
+    }
+    ctx.fillStyle = liqGrad
+    ctx.fillRect(lavaX - lavaW/2, lavaY + 10, lavaW, lavaH - 26)
+
+    // Lava Blobs! (Pulsing and moving with time & slider speed)
+    const blobColor = currentPalette.value === 'sunset-cozy' ? '#ff5533' : currentPalette.value === 'forest-cabin' ? '#39ff6a' : '#ff2a6d'
+    ctx.fillStyle = blobColor
+
+    const timeSec = Date.now() * 0.001 * glowIntensity
+    const blobCount = 3
+    for (let b = 0; b < blobCount; b++) {
+        // Calculate organic vertical oscillation
+        const offset = (b * (lavaH / 3) + timeSec * 16) % (lavaH - 30)
+        const by = lavaY + lavaH - 20 - offset
+        const bsizeW = 7 + Math.sin(timeSec + b) * 2.2
+        const bsizeH = 6 + Math.cos(timeSec * 0.8 + b) * 1.8
+
+        ctx.beginPath()
+        ctx.ellipse(lavaX + Math.sin(timeSec * 1.5 + b) * 2.2, by, bsizeW, bsizeH, 0, 0, Math.PI * 2)
+        ctx.fill()
+    }
+
+    // Static reservoir blobs at top and bottom
+    ctx.beginPath()
+    ctx.ellipse(lavaX, lavaY + 16, 11, 4.5 + Math.sin(timeSec) * 1.2, 0, 0, Math.PI * 2)
+    ctx.ellipse(lavaX, lavaY + lavaH - 20, 13, 6 + Math.cos(timeSec * 1.2) * 1.2, 0, 0, Math.PI * 2)
+    ctx.fill()
+
+    ctx.restore() // End Glass clipping
+
+    // Glass container outline
+    ctx.strokeStyle = palette.wallShadow
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.roundRect(lavaX - lavaW/2, lavaY + 10, lavaW, lavaH - 26, 7)
+    ctx.stroke()
+
+    // Metal Cap
+    ctx.fillStyle = '#475569'
+    ctx.beginPath()
+    ctx.roundRect(lavaX - lavaW/2 + 3, lavaY, lavaW - 6, 10, 2)
+    ctx.fill()
+    ctx.stroke()
     ctx.restore()
 
     // 15. COZY WARM FAIRY STRING LIGHTS (DRAPED ACROSS CEILING)
@@ -1499,11 +2162,16 @@ onMounted(() => {
             canvas.width = viewport.clientWidth
             canvas.height = viewport.clientHeight
             initSkyElements()
+            updateTopUiHeight()
         }
     }
 
     handleResize()
     window.addEventListener('resize', handleResize)
+
+    nextTick(() => {
+        updateTopUiHeight()
+    })
 
     // Render tick loop
     const render = (timestamp) => {
@@ -1558,16 +2226,9 @@ onMounted(() => {
                 }
             });
         }
-
-        if (state?.styles) {
-            const root = document.documentElement;
-
-            Object.entries(state.styles).forEach(([key, value]) => {
-                if (value !== undefined && value !== null) {
-                    root.style.setProperty(key, value);
-                }
-            });
-        }
+        nextTick(() => {
+            updateTopUiHeight()
+        })
     }
 
     const onOpen = (payload) => {
@@ -1584,6 +2245,9 @@ onMounted(() => {
 
     const onTheme = (payload) => {
         if (payload?.theme) theme.value = payload.theme
+        nextTick(() => {
+            updateTopUiHeight()
+        })
     }
 
     const onReaction = (payload) => {
@@ -1734,6 +2398,9 @@ const handleRepeat = () => {
     width: 100%;
     height: 100%;
     touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    user-select: none;
 }
 
 /* VIEWPORT ENGINE */
@@ -1743,6 +2410,9 @@ const handleRepeat = () => {
     width: 100%;
     overflow: hidden;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    user-select: none;
 }
 
 /* WEATHER PILLS OVERLAY */
@@ -1783,23 +2453,34 @@ const handleRepeat = () => {
 /* WATERCOLOR BUBBLE INFO */
 .lofi-bubble-info {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    bottom: 16px;
+    left: 0;
+    width: 100%;
     z-index: 10;
-    background: rgba(255, 117, 151, 0.18);
-    border: 1px solid #ff7597;
-    color: #ffb3c1;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 6px 12px;
-    border-radius: 8px;
-    backdrop-filter: blur(4px);
-    animation: slide-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    justify-content: center;
     pointer-events: none;
+    box-sizing: border-box;
+    padding: 0 20px;
+    animation: slide-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes slide-in {
-    from { opacity: 0; transform: translateY(-10px); }
+.lofi-bubble-info span {
+    background: rgba(14, 11, 26, 0.9);
+    border: 1px solid #ff7597;
+    color: #ffb3c1;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 24px;
+    border-radius: 99px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 117, 151, 0.25);
+    text-align: center;
+    max-width: 90vw;
+}
+
+@keyframes slide-up {
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -1809,7 +2490,7 @@ const handleRepeat = () => {
     min-height: 80px;
     box-sizing: border-box;
     display: flex;
-    align-items: center;
+    align-items: end;
     z-index: 10;
     padding: 0 20px 12px;
     border-bottom: 2px solid rgba(255, 170, 102, 0.25);
@@ -1889,22 +2570,49 @@ const handleRepeat = () => {
     background: linear-gradient(180deg, #2d1e2f 0%, #170d18 100%);
     border-top: 3px solid #ffaa66;
     box-shadow: 0 -8px 24px rgba(255, 170, 102, 0.2);
-    padding: 12px 16px;
+    padding: 20px 24px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
     flex-shrink: 0;
     z-index: 15;
+    padding-bottom: calc(20px + var(--max-safe-area-inset-bottom, var(--tg-safe-area-inset-bottom, 0px)));
 }
 
 /* ADJUSTMENTS & PRESETS */
 .cozy-adjustments {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding-bottom: 12px;
+    gap: 14px;
+    padding-bottom: 16px;
     border-bottom: 1px dashed rgba(255, 170, 102, 0.2);
+}
+
+@media (min-width: 640px) {
+    .cozy-adjustments {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .cozy-quick-vibes {
+        grid-column: span 2;
+        display: flex;
+        justify-content: center;
+        margin-top: 6px;
+    }
+}
+
+@media (min-width: 768px) {
+    .cozy-adjustments {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    
+    .cozy-quick-vibes {
+        grid-column: span 3;
+    }
 }
 
 .cozy-slider-group {

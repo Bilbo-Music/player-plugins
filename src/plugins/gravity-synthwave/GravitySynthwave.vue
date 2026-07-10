@@ -3,7 +3,7 @@
         <canvas ref="canvasRef" class="gd-canvas" id="gd-game-canvas"></canvas>
 
         <!-- TOP PANEL: track info -->
-        <div class="ui-panel top-panel" id="gd-top-panel">
+        <div ref="topPanelRef" class="ui-panel top-panel" id="gd-top-panel">
             <div class="track-card" id="gd-track-card">
                 <div class="track-cover" id="gd-track-cover">
                     <img
@@ -128,12 +128,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { playerSdk } from '@bilbomusic/player-plugin-sdk'
 
 const canvasRef = ref(null)
 const minimapCanvasRef = ref(null)
 const minimapContainerRef = ref(null)
+const topPanelRef = ref(null)
 
 const theme = ref('dark')
 const isExpanded = ref(true)
@@ -160,7 +161,14 @@ const trackInfo = ref({
 })
 
 // Game constants
-const TOP_UI_HEIGHT = 90
+const TOP_UI_HEIGHT = ref(90)
+
+const updateTopUiHeight = () => {
+    if (topPanelRef.value) {
+        TOP_UI_HEIGHT.value = topPanelRef.value.offsetHeight || 90
+    }
+}
+
 const FLAT_START_PX = 180
 const FLAT_FINISH_PX = 220
 const SEGMENT_PX = 58
@@ -1104,10 +1112,14 @@ onMounted(() => {
             minimapCanvas.width = Math.max(120, Math.round(rect.width))
             minimapCanvas.height = Math.max(20, Math.round(rect.height))
         }
+        updateTopUiHeight()
     }
 
     handleResize()
     window.addEventListener('resize', handleResize)
+    nextTick(() => {
+        updateTopUiHeight()
+    })
 
     const handleKeyDown = (e) => {
         const keyMap = {
@@ -1156,7 +1168,7 @@ onMounted(() => {
 
         const w = canvasRef.value.width
         const h = canvasRef.value.height
-        const gameTopY = TOP_UI_HEIGHT
+        const gameTopY = TOP_UI_HEIGHT.value
         const gameBottomY = h - 12
         const playableHeight = Math.max(80, gameBottomY - gameTopY)
         const baseGroundY = gameTopY + playableHeight * 0.78
@@ -1283,6 +1295,9 @@ onMounted(() => {
                 }
             });
         }
+        nextTick(() => {
+            updateTopUiHeight()
+        })
     }
 
     const onOpen = (payload) => {
@@ -1463,9 +1478,10 @@ onMounted(() => {
 
 .top-panel {
     top: 0;
-    min-height: 90px;
+    min-height: 80px;
     border-bottom: 1px solid;
     padding: 0 16px 12px;
+    align-items: end;
     justify-content: space-between;
     gap: 12px;
     padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));

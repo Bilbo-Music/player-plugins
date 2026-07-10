@@ -9,7 +9,7 @@
         <div class="vault-app-container" id="vultisig-dashboard-app">
             
             <!-- MAIN COMPACT HEADER WITH NAVIGATION SEGMENTS -->
-            <header class="vault-app-header" id="vultisig-header-panel">
+            <header ref="topPanelRef" class="vault-app-header" id="vultisig-header-panel">
                 <div class="header-content">
                     
                     <!-- Branding Block -->
@@ -49,18 +49,16 @@
                 <div v-show="activeTab === 'flight'" class="tab-view-container flight-view" id="view-flight">
                     
                     <!-- Cinematic Flight Stage Canvas -->
-                    <div class="flight-stage-container" @mousedown="handleStageInteraction" @touchstart="handleStageInteraction">
+                    <div class="flight-stage-container">
                         
                         <!-- Overlay Ambient Flight Data HUD -->
                         <div class="flight-hud-panel">
                             <div class="status-node-badge">
-                                <span class="pulse-dot"></span>
-                                <span>Secure Node</span>
+                                <span class="pulse-dot" :class="{ 'warning-dot': shieldIntegrity < 40 }"></span>
+                                <span class="hud-game-stats">
+                                    SHIELD: <span :class="{ 'threat-text': shieldIntegrity < 40 }">{{ Math.floor(shieldIntegrity) }}%</span> | SCORE: {{ gameScore }} XP
+                                </span>
                             </div>
-                           <!--  <div class="hud-left">
-                                <span class="hud-mono-label">MEDITATIVE BROADCAST FEED</span>
-                                <span class="hud-title">{{ trackInfo.title }}</span>
-                            </div> -->
                             <div class="hud-right">
                                 <span class="hud-mono-label gray">PROPULSION SPEED</span>
                                 <span class="hud-value" :class="{ 'pulse-active': isPlaying }">
@@ -70,12 +68,34 @@
                         </div>
 
                         <!-- Main Flight Loop Canvas -->
-                        <canvas ref="flightCanvasRef" class="flight-visual-canvas"></canvas>
+                        <canvas 
+                            ref="flightCanvasRef" 
+                            class="flight-visual-canvas"
+                            @mousedown="handleCanvasPointer"
+                            @mousemove="handleCanvasPointerMove"
+                            @touchstart="handleCanvasTouch"
+                            @touchmove="handleCanvasTouchMove"
+                        ></canvas>
+
+                        <!-- Interactive Steering Tip Overlay -->
+                        <div class="flight-steering-overlay-tip">
+                            <span>🎮 Drag / Tap or use Arrow/WASD keys to steer</span>
+                        </div>
                     </div>
 
                     <!-- INTEGRATED DETAILED BROADCASTING CONTROLS -->
                     <div class="broadcast-control-card">
                         
+                        <!-- GLOBAL CONSOLE ALERTS AND TOASTS (FULL-WIDTH JUST ABOVE CARD) -->
+                        <transition name="fade-toast">
+                            <div v-if="toastMessage" class="vultisig-console-toast" id="vultisig-alert">
+                                <div class="toast-content-wrapper">
+                                    <span class="toast-indicator-dot"></span>
+                                    <span class="toast-body-text">{{ toastMessage }}</span>
+                                </div>
+                            </div>
+                        </transition>
+
                         <!-- Track meta & secure indicator -->
                         <div class="track-meta-row">
                             <div class="track-title-info">
@@ -272,9 +292,12 @@
                             <div class="crypto-asset-tile">
                                 <div class="asset-details-left">
                                     <div class="asset-logo-box rune-bg" :style="coinPulseStyle">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" fill="#33E6BF" opacity="0.15"/>
-                                            <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1.2 5.5l-.8 2.2h2.5c.3 0 .5.2.5.5v.6c0 .3-.2.5-.5.5h-3.2l-1.3 3.7h4c.3 0 .5.2.5.5v.6c0 .3-.2.5-.5.5H9.6L8 18H6.5l1.6-4.5H5.5c-.3 0-.5-.2-.5-.5v-.6c0-.3.2-.5.5-.5h3.2l1.3-3.7H6c-.3 0-.5-.2-.5-.5v-.6c0-.3.2-.5.5-.5h4.6l1.6-4.5H13.2z" fill="#33E6BF" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="18" viewBox="0 0 253.3 290.5" xml:space="preserve">
+                                            <linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-321.7246" y1="644.2814" x2="-320.7246" y2="644.2814" gradientTransform="matrix(253.26 0 0 -290.5 81479.9766 187309)">
+                                                <stop offset="0" style="stop-color:#00CCFF"/>
+                                                <stop offset="1" style="stop-color:#33FF99"/>
+                                            </linearGradient>
+                                            <path class="st0" d="M0,290.5l202.8-85.4L138.6,140L0,290.5z M74.5,75l64.2,65L253.3,0L74.5,75z" fill="#33E6BF"/>
                                         </svg>
                                     </div>
                                     <div class="asset-names">
@@ -288,20 +311,94 @@
                                 </div>
                             </div>
 
-                            <!-- Kujira ($RUJI) Tile -->
+                            <!-- Rujira ($RUJI) Tile -->
                             <div class="crypto-asset-tile">
                                 <div class="asset-details-left">
                                     <div class="asset-logo-box ruji-bg" :style="coinPulseStyle">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M2.5 13.5L8 9.5L14.5 11L11.5 14.5L2.5 13.5Z" fill="#A78BFA"/>
-                                            <path d="M14.5 11L19.5 8L18.5 12.5L14.5 11Z" fill="#C4B5FD"/>
-                                            <path d="M19.5 8L21.5 6L21 9L19.5 8Z" fill="#E0E7FF"/>
-                                            <path d="M11.5 14.5L9.5 18.5L8.5 15L11.5 14.5Z" fill="#818CF8"/>
-                                            <path d="M2.5 13.5L8 9.5L5.5 8.5L2.5 13.5Z" fill="#7C3AED"/>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" viewBox="0 0 1024 1024">
+                                          <defs>
+                                            <linearGradient id="g" x1="0%" y1="100%" x2="100%" y2="0%">
+                                              <stop offset="0%" stop-color="#7c3cff"/>
+                                              <stop offset="50%" stop-color="#b52cff"/>
+                                              <stop offset="100%" stop-color="#ff00d4"/>
+                                            </linearGradient>
+                                          </defs>
+
+                                          <!-- outer ring -->
+                                          <circle cx="512" cy="512" r="480" fill="url(#g)"/>
+
+                                          <!-- inner circle -->
+                                          <circle cx="512" cy="512" r="425" fill="#1d1b22"/>
+
+                                          <g fill="url(#g)">
+                                            <!-- R -->
+                                            <path d="
+                                              M250 290
+                                              H470
+                                              V430
+                                              H395
+                                              L465 500
+                                              H360
+                                              L305 445
+                                              H250
+                                              V580
+                                              H185
+                                              V290
+                                              Z
+
+                                              M315 350
+                                              V390
+                                              H405
+                                              V350
+                                              Z"/>
+
+                                            <!-- U -->
+                                            <path d="
+                                              M540 290
+                                              H610
+                                              V470
+                                              L650 510
+                                              H790
+                                              V290
+                                              H860
+                                              V580
+                                              H630
+                                              L540 490
+                                              Z"/>
+
+                                            <!-- D -->
+                                            <path d="
+                                              M250 650
+                                              H315
+                                              V820
+                                              H470
+                                              V590
+                                              H540
+                                              V845
+                                              L465 920
+                                              H250
+                                              Z"/>
+
+                                            <!-- I -->
+                                            <path d="
+                                              M585 590
+                                              H860
+                                              V650
+                                              H755
+                                              V860
+                                              H860
+                                              V920
+                                              H585
+                                              V860
+                                              H690
+                                              V650
+                                              H585
+                                              Z"/>
+                                          </g>
                                         </svg>
                                     </div>
                                     <div class="asset-names">
-                                        <span class="asset-name-text">Kujira</span>
+                                        <span class="asset-name-text">RUJI</span>
                                         <span class="asset-network-text">RUJI NETWORK</span>
                                     </div>
                                 </div>
@@ -533,13 +630,7 @@
             </div>
         </div>
 
-        <!-- GLOBAL CONSOLE ALERTS AND TOASTS -->
-        <transition name="fade-toast">
-            <div v-if="toastMessage" class="vultisig-console-toast" id="vultisig-alert">
-                <div class="toast-title">Vultisig Console</div>
-                <div class="toast-body">{{ toastMessage }}</div>
-            </div>
-        </transition>
+
 
     </div>
 </template>
@@ -547,6 +638,16 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed, watch, nextTick } from 'vue'
 import { playerSdk } from '@bilbomusic/player-plugin-sdk'
+
+const topPanelRef = ref(null)
+const TOP_UI_HEIGHT = ref(80)
+
+const updateTopUiHeight = () => {
+    if (topPanelRef.value) {
+        TOP_UI_HEIGHT.value = topPanelRef.value.offsetHeight || 80
+        document.documentElement.style.setProperty('--top-ui-height', `${TOP_UI_HEIGHT.value}px`)
+    }
+}
 
 // 1. Core States
 const activeTab = ref('flight') // 'flight' | 'vault' | 'mpc'
@@ -701,6 +802,86 @@ const handleNext = () => {
     }
 }
 
+// Interactive Spaceship steering & mechanics
+const targetX = ref(150)
+const targetY = ref(250)
+const gameScore = ref(0)
+const shieldIntegrity = ref(100)
+
+const isDraggingPointer = ref(false)
+
+const handleCanvasPointer = (e) => {
+    isDraggingPointer.value = true
+    updateTargetFromEvent(e)
+    interactivePropulsionTimer = 40
+    audioData.value.low = Math.min(1.0, audioData.value.low + 0.3)
+}
+
+const handleCanvasPointerMove = (e) => {
+    if (isDraggingPointer.value) {
+        updateTargetFromEvent(e)
+    }
+}
+
+const handleCanvasTouch = (e) => {
+    isDraggingPointer.value = true
+    updateTargetFromTouchEvent(e)
+    interactivePropulsionTimer = 40
+    audioData.value.low = Math.min(1.0, audioData.value.low + 0.3)
+}
+
+const handleCanvasTouchMove = (e) => {
+    if (isDraggingPointer.value) {
+        updateTargetFromTouchEvent(e)
+    }
+}
+
+const handlePointerUp = () => {
+    isDraggingPointer.value = false
+}
+
+const updateTargetFromEvent = (e) => {
+    const canvas = flightCanvasRef.value
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width) * canvas.width
+    const y = ((e.clientY - rect.top) / rect.height) * canvas.height
+    targetX.value = Math.max(20, Math.min(canvas.width - 20, x))
+    targetY.value = Math.max(30, Math.min(canvas.height - 30, y))
+}
+
+const updateTargetFromTouchEvent = (e) => {
+    const canvas = flightCanvasRef.value
+    if (!canvas || e.touches.length === 0) return
+    const rect = canvas.getBoundingClientRect()
+    const touch = e.touches[0]
+    const x = ((touch.clientX - rect.left) / rect.width) * canvas.width
+    const y = ((touch.clientY - rect.top) / rect.height) * canvas.height
+    targetX.value = Math.max(20, Math.min(canvas.width - 20, x))
+    targetY.value = Math.max(30, Math.min(canvas.height - 30, y))
+}
+
+const handleKeyDown = (e) => {
+    if (activeTab.value !== 'flight') return
+    const step = 15
+    const canvas = flightCanvasRef.value
+    const w = canvas ? canvas.width : 300
+    const h = canvas ? canvas.height : 380
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        e.preventDefault()
+        targetX.value = Math.max(20, targetX.value - step)
+    } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        e.preventDefault()
+        targetX.value = Math.min(w - 20, targetX.value + step)
+    } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+        e.preventDefault()
+        targetY.value = Math.max(30, targetY.value - step)
+    } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+        e.preventDefault()
+        targetY.value = Math.min(h - 30, targetY.value + step)
+    }
+}
+
 // Tap space flight stage to gain interactive propulsion acceleration
 let interactivePropulsionTimer = 0
 const handleStageInteraction = () => {
@@ -791,6 +972,9 @@ const initVisualizers = () => {
     const flightCanvas = flightCanvasRef.value
     const mpcCanvas = mpcCanvasRef.value
 
+    let rocketX = 150
+    let rocketY = 320
+
     // Parallax stars
     const stars = []
     for (let i = 0; i < 50; i++) {
@@ -816,6 +1000,32 @@ const initVisualizers = () => {
             rotation: Math.random() * Math.PI * 2,
             rotSpeed: (Math.random() - 0.5) * 0.05,
             glowing: Math.random() > 0.4
+        })
+    }
+
+    // Rogue Threats (Malicious Nodes / Anomalies)
+    const threats = []
+    const spawnThreat = (w) => {
+        threats.push({
+            x: Math.random() * w,
+            y: -20,
+            speed: 1.5 + Math.random() * 2.0,
+            size: 10 + Math.random() * 8,
+            rotation: Math.random() * Math.PI * 2,
+            rotSpeed: (Math.random() - 0.5) * 0.08,
+            type: Math.random() > 0.5 ? 'malware' : 'leak'
+        })
+    }
+
+    // Security Gateways (Green rings)
+    const gateways = []
+    const spawnGateway = (w) => {
+        gateways.push({
+            x: Math.random() * w,
+            y: -20,
+            speed: 0.8 + Math.random() * 1.0,
+            size: 14 + Math.random() * 6,
+            pulse: 0
         })
     }
 
@@ -875,6 +1085,31 @@ const initVisualizers = () => {
                     coin.y += coinSpeed
                     coin.rotation += coin.rotSpeed
 
+                    // Collision detection with rocket
+                    const distToRocket = Math.hypot(coin.x - rocketX, coin.y - rocketY)
+                    if (distToRocket < (coin.size + 18)) {
+                        // Collect coin!
+                        gameScore.value += 10
+                        showToast(`🪙 Secure multi-chain share collected! +10 XP`)
+                        
+                        // Spawn explosion/collection particles!
+                        for (let p = 0; p < 8; p++) {
+                            sparks.push({
+                                x: coin.x,
+                                y: coin.y,
+                                vx: (Math.random() - 0.5) * 5,
+                                vy: (Math.random() - 0.5) * 5,
+                                size: 2 + Math.random() * 3,
+                                alpha: 1.0,
+                                color: coin.type === 'VULT' ? '#33E6BF' : (coin.type === 'RUNE' ? '#f59e0b' : '#c084fc')
+                            })
+                        }
+                        
+                        // Remove coin
+                        coins.splice(cIdx, 1)
+                        return
+                    }
+
                     // Draw Coin
                     ctx.save()
                     ctx.translate(coin.x, coin.y)
@@ -927,18 +1162,155 @@ const initVisualizers = () => {
                     }
                 })
 
-                // 4. Meditative Space Rocket calculations
-                const time = Date.now() * 0.0035
-                const rocketX = w / 2
-                // Gentle floating up and down
-                const rocketY = (h / 2) - 15 + Math.sin(time) * 6
+                // 3.1 Spawn and update threats (Red anomalous hacker asteroids)
+                if (Math.random() < 0.012 && threats.length < 5) {
+                    spawnThreat(w)
+                }
+
+                threats.forEach((threat, tIdx) => {
+                    const threatSpeed = threat.speed * (isPlaying.value ? 1.2 : 0.3)
+                    threat.y += threatSpeed
+                    threat.rotation += threat.rotSpeed
+
+                    // Collision detection with rocket
+                    const distToRocket = Math.hypot(threat.x - rocketX, threat.y - rocketY)
+                    if (distToRocket < (threat.size + 14)) {
+                        // Impact! Lose shield
+                        shieldIntegrity.value = Math.max(0, shieldIntegrity.value - 15)
+                        showToast(`⚠️ Node anomalous attack blocked! Airgap shields: ${Math.floor(shieldIntegrity.value)}%`)
+                        
+                        // Spawn impact red particles!
+                        for (let p = 0; p < 12; p++) {
+                            sparks.push({
+                                x: threat.x,
+                                y: threat.y,
+                                vx: (Math.random() - 0.5) * 6,
+                                vy: (Math.random() - 0.5) * 6,
+                                size: 2 + Math.random() * 4,
+                                alpha: 1.0,
+                                color: '#ef4444' // Red warning sparks
+                            })
+                        }
+
+                        threats.splice(tIdx, 1)
+                        return
+                    }
+
+                    // Render threat
+                    ctx.save()
+                    ctx.translate(threat.x, threat.y)
+                    ctx.rotate(threat.rotation)
+
+                    // Draw a red triangular hazard icon
+                    ctx.shadowBlur = 8
+                    ctx.shadowColor = '#ef4444'
+                    ctx.fillStyle = '#1e0c0c'
+                    ctx.strokeStyle = '#ef4444'
+                    ctx.lineWidth = 1.5
+
+                    ctx.beginPath()
+                    ctx.moveTo(0, -threat.size)
+                    ctx.lineTo(threat.size, threat.size)
+                    ctx.lineTo(-threat.size, threat.size)
+                    ctx.closePath()
+                    ctx.fill()
+                    ctx.stroke()
+
+                    // Central exclamation/hazard mark
+                    ctx.fillStyle = '#ffffff'
+                    ctx.font = `bold ${threat.size * 0.8}px monospace`
+                    ctx.textAlign = 'center'
+                    ctx.textBaseline = 'middle'
+                    ctx.fillText('!', 0, threat.size * 0.1)
+
+                    ctx.restore()
+
+                    // Delete threat below viewport
+                    if (threat.y > h + 20) {
+                        threats.splice(tIdx, 1)
+                    }
+                })
+
+                // 3.2 Spawn and update gateways (Green rings)
+                if (Math.random() < 0.007 && gateways.length < 2) {
+                    spawnGateway(w)
+                }
+
+                gateways.forEach((gate, gIdx) => {
+                    const gateSpeed = gate.speed * (isPlaying.value ? 1.0 : 0.2)
+                    gate.y += gateSpeed
+                    gate.pulse += 0.05
+
+                    // Collision detection with rocket
+                    const distToRocket = Math.hypot(gate.x - rocketX, gate.y - rocketY)
+                    if (distToRocket < (gate.size + 12)) {
+                        // Pass through gateway!
+                        gameScore.value += 25
+                        shieldIntegrity.value = Math.min(100, shieldIntegrity.value + 20)
+                        showToast(`🛡️ Node Gateway validated! Shields recharged, +25 XP`)
+
+                        // Spawn nice green gateway particles!
+                        for (let p = 0; p < 15; p++) {
+                            sparks.push({
+                                x: gate.x,
+                                y: gate.y,
+                                vx: Math.cos(p * (Math.PI * 2 / 15)) * 4,
+                                vy: Math.sin(p * (Math.PI * 2 / 15)) * 4,
+                                size: 2.5 + Math.random() * 2,
+                                alpha: 1.0,
+                                color: '#10b981'
+                            })
+                        }
+
+                        gateways.splice(gIdx, 1)
+                        return
+                    }
+
+                    // Render gateway (glowing dashed green circle/ring)
+                    ctx.save()
+                    ctx.shadowBlur = 12
+                    ctx.shadowColor = '#10b981'
+                    ctx.strokeStyle = '#10b981'
+                    ctx.lineWidth = 2 + Math.sin(gate.pulse) * 0.5
+                    ctx.setLineDash([6, 4])
+                    
+                    ctx.beginPath()
+                    ctx.arc(gate.x, gate.y, gate.size + Math.sin(gate.pulse) * 2, 0, Math.PI * 2)
+                    ctx.stroke()
+                    ctx.restore()
+
+                    // Delete gateway below viewport
+                    if (gate.y > h + 30) {
+                        gateways.splice(gIdx, 1)
+                    }
+                })
+
+                // 3.3 Regenerate Shield Slowly over time
+                if (shieldIntegrity.value < 100) {
+                    shieldIntegrity.value = Math.min(100, shieldIntegrity.value + 0.03)
+                }
+
+                // 4. Smooth ease of rocket position to targetX/targetY refs
+                const ease = 0.08
+                if (targetX.value === 150 && targetY.value === 250) {
+                    targetX.value = w / 2
+                    targetY.value = h - 60
+                    rocketX = w / 2
+                    rocketY = h - 60
+                }
+                rocketX += (targetX.value - rocketX) * ease
+                rocketY += (targetY.value - rocketY) * ease
+
+                // Keep rocket in bounds
+                rocketX = Math.max(20, Math.min(w - 20, rocketX))
+                rocketY = Math.max(50, Math.min(h - 40, rocketY))
 
                 // Thrusters sparks spawn logic
                 const spawnCount = isBoosting ? 12 : (isPlaying.value ? Math.floor(1 + audioData.value.low * 6) : 0)
                 for (let s = 0; s < spawnCount; s++) {
                     sparks.push({
                         x: rocketX + (Math.random() - 0.5) * 12,
-                        y: rocketY + 45,
+                        y: rocketY + 35,
                         vx: (Math.random() - 0.5) * 3,
                         vy: 4 + Math.random() * 6 * (isBoosting ? 3 : 1),
                         size: 1.5 + Math.random() * 3,
@@ -1062,18 +1434,18 @@ const initVisualizers = () => {
                 ctx.shadowBlur = 0
                 ctx.strokeStyle = '#ffffff'
                 ctx.lineWidth = 1.2
-                const cx = rocketX
-                const cy = rocketY - 4
+                const cx_window = rocketX
+                const cy_window = rocketY - 4
                 ctx.beginPath()
                 // Top vertical leg
-                ctx.moveTo(cx, cy + 3)
-                ctx.lineTo(cx, cy - 7)
+                ctx.moveTo(cx_window, cy_window + 3)
+                ctx.lineTo(cx_window, cy_window - 7)
                 // Left leg
-                ctx.moveTo(cx, cy + 3)
-                ctx.lineTo(cx - 6, cy + 6)
+                ctx.moveTo(cx_window, cy_window + 3)
+                ctx.lineTo(cx_window - 6, cy_window + 6)
                 // Right leg
-                ctx.moveTo(cx, cy + 3)
-                ctx.lineTo(cx + 6, cy + 6)
+                ctx.moveTo(cx_window, cy_window + 3)
+                ctx.lineTo(cx_window + 6, cy_window + 6)
                 ctx.stroke()
 
                 ctx.restore()
@@ -1189,6 +1561,12 @@ const initVisualizers = () => {
 
 // 2. Initial Setup and Lifecycle hooks
 onMounted(() => {
+    updateTopUiHeight()
+    window.addEventListener('resize', updateTopUiHeight)
+    window.addEventListener('mouseup', handlePointerUp)
+    window.addEventListener('touchend', handlePointerUp)
+    window.addEventListener('keydown', handleKeyDown)
+
     // Override the native layout and player components
     if (playerSdk && typeof playerSdk.setUiConfig === 'function') {
         playerSdk.setUiConfig({
@@ -1270,6 +1648,10 @@ onMounted(() => {
                 }
             });
         }
+
+        nextTick(() => {
+            updateTopUiHeight()
+        })
     }
 
     const onOpen = (payload) => {
@@ -1320,6 +1702,10 @@ onMounted(() => {
         cancelAnimationFrame(animationId)
         clearInterval(rateIntervalId)
         clearInterval(timeIntervalId)
+        window.removeEventListener('resize', updateTopUiHeight)
+        window.removeEventListener('mouseup', handlePointerUp)
+        window.removeEventListener('touchend', handlePointerUp)
+        window.removeEventListener('keydown', handleKeyDown)
 
         if (playerSdk && typeof playerSdk.off === 'function') {
             playerSdk.off('init', onInit)
@@ -1429,7 +1815,7 @@ onMounted(() => {
     padding: 14px 20px;
     z-index: 30;
     position: relative;
-    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 2px);
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 22px);
 }
 
 .header-content {
@@ -1643,6 +2029,9 @@ onMounted(() => {
     position: relative;
     overflow: hidden;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    user-select: none;
 }
 @media (min-width: 1024px) {
     .flight-stage-container {
@@ -1655,6 +2044,9 @@ onMounted(() => {
     height: 100%;
     display: block;
     image-rendering: auto;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    user-select: none;
 }
 
 .flight-hud-panel {
@@ -2552,45 +2944,111 @@ onMounted(() => {
     font-weight: 700;
 }
 
-/* CONSOLE TOAST ALERTS */
+/* CONSOLE TOAST ALERTS (FULL-WIDTH FLOATING STYLE) */
 .vultisig-console-toast {
-    position: fixed;
-    top: 24px;
-    right: 24px;
-    background-color: #06080c;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-left: 2px solid #33E6BF;
-    border-radius: 12px;
-    padding: 10px 14px;
-    max-width: 250px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    transform: translateY(-100%);
     z-index: 50;
     display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-family: 'JetBrains Mono', monospace;
+    justify-content: center;
     pointer-events: none;
+    box-sizing: border-box;
+    padding: 0;
 }
 
-.toast-title {
+.toast-content-wrapper {
+    background: rgba(3, 4, 7, 0.98);
+    border-top: 1px solid rgba(51, 230, 191, 0.4);
+    border-bottom: 1px solid rgba(51, 230, 191, 0.4);
     color: #33E6BF;
-    font-weight: 800;
-    letter-spacing: 0.15em;
-    font-size: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 500;
+    padding: 6px 16px;
+    width: 100%;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: auto;
+    box-sizing: border-box;
+    animation: slide-up 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-indicator-dot {
+    width: 5px;
+    height: 5px;
+    background-color: #33E6BF;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #33E6BF;
+    flex-shrink: 0;
+    animation: indicator-flash 1s infinite alternate;
+}
+
+.toast-body-text {
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
 }
-.toast-body {
-    color: #cbd5e1;
-    font-size: 9.5px;
-    line-height: 1.25;
+
+@keyframes slide-up {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes indicator-flash {
+    from { opacity: 0.4; }
+    to { opacity: 1; }
 }
 
 .fade-toast-enter-active, .fade-toast-leave-active {
-    transition: all 0.3s ease;
+    transition: opacity 0.2s ease, transform 0.2s ease;
 }
 .fade-toast-enter-from, .fade-toast-leave-to {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(-90%) scaleY(0.9);
+}
+
+/* HELPER GAME AND HUD INTERACTIVE OVERLAY STYLE RULES */
+.flight-steering-overlay-tip {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: #64748b;
+    background-color: rgba(3, 4, 8, 0.85);
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(51, 230, 191, 0.15);
+    pointer-events: none;
+    text-align: center;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.hud-game-stats {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: #cbd5e1;
+    letter-spacing: 0.02em;
+}
+
+.threat-text {
+    color: #ef4444;
+    animation: simple-pulse 1s infinite alternate;
+}
+
+.warning-dot {
+    background-color: #ef4444 !important;
+    box-shadow: 0 0 8px #ef4444 !important;
 }
 
 /* MOBILE AND TABLET RESPONSIVE ADAPTATION */

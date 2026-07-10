@@ -1,7 +1,7 @@
 <template>
     <div class="bounce-container" :class="[theme]" id="ab-app-container">
         <!-- TOP TRACK META PANEL -->
-        <div class="ab-top-panel" id="ab-top-panel">
+        <div ref="topPanelRef" class="ab-top-panel" id="ab-top-panel">
             <div class="ab-track-card" id="ab-track-card">
                 <div class="ab-cover-wrapper" id="ab-cover-wrapper">
                     <img
@@ -127,11 +127,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, reactive } from 'vue'
+import { ref, onMounted, onBeforeUnmount, reactive, nextTick } from 'vue'
 import { playerSdk } from '@bilbomusic/player-plugin-sdk'
 
 const canvasRef = ref(null)
 const viewportRef = ref(null)
+const topPanelRef = ref(null)
 const theme = ref('dark')
 const isExpanded = ref(true)
 const playerState = ref('paused')
@@ -139,6 +140,14 @@ const reaction = ref('')
 const repeat = ref('none')
 const isCoverLoaded = ref(false)
 const showTapPrompt = ref(true)
+
+const TOP_UI_HEIGHT = ref(80)
+
+const updateTopUiHeight = () => {
+    if (topPanelRef.value) {
+        TOP_UI_HEIGHT.value = topPanelRef.value.offsetHeight || 80
+    }
+}
 
 const nextDisabled = ref(false)
 const prevDisabled = ref(true)
@@ -154,7 +163,7 @@ const trackInfo = ref({
 
 // Interactive Sandbox States
 const balls = ref([])
-const maxBalls = 160
+const maxBalls = 60
 const bounceCount = ref(0)
 const kineticEnergy = ref(0)
 const activePreset = ref('neon-party')
@@ -730,11 +739,16 @@ onMounted(() => {
             sandboxBox.right = canvas.width - sandboxBox.padding
             sandboxBox.top = sandboxBox.padding
             sandboxBox.bottom = canvas.height - sandboxBox.padding
+
+            updateTopUiHeight()
         }
     }
 
     handleResize()
     window.addEventListener('resize', handleResize)
+    nextTick(() => {
+        updateTopUiHeight()
+    })
 
     // Seed with initial balls
     for (let i = 0; i < 3; i++) {
@@ -870,6 +884,9 @@ onMounted(() => {
                     root.style.setProperty(key, value);
                 }
             });
+            nextTick(() => {
+                updateTopUiHeight()
+            })
         }
     }
 
@@ -1144,7 +1161,7 @@ const formatNumber = (num) => {
     min-height: 80px;
     box-sizing: border-box;
     display: flex;
-    align-items: center;
+    align-items: end;
     z-index: 10;
     padding: 0 20px 12px;
     border-bottom: 2px solid rgba(5, 217, 232, 0.25);

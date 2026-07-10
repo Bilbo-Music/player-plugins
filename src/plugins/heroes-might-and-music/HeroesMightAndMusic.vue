@@ -9,7 +9,7 @@
         ></canvas>
 
         <!-- TOP PANEL: scroll banner with track "portrait" -->
-        <div class="ui-panel top-panel">
+        <div ref="topPanelRef" class="ui-panel top-panel">
             <div class="track-card">
                 <div class="portrait-frame">
                     <div class="track-cover" :class="{ 'is-loading': !isCoverLoaded }">
@@ -91,13 +91,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { playerSdk } from '@bilbomusic/player-plugin-sdk'
 
 // -----------------------------------------------------------------
 // 1. STATE & CONSTANTS
 // -----------------------------------------------------------------
 const canvasRef = ref(null)
+const topPanelRef = ref(null)
 
 const theme = ref('dark')
 const isExpanded = ref(true)
@@ -116,9 +117,15 @@ const goldTotal = ref(Number(localStorage.getItem('homm-plugin-gold')) || 0)
 const dayCount = ref(1)
 const progressPercent = ref(0)
 
-const TOP_UI_HEIGHT = 96
+const TOP_UI_HEIGHT = ref(96)
 const BOTTOM_UI_HEIGHT = 118
 const SYNC_THRESHOLD = 1000
+
+const updateTopUiHeight = () => {
+    if (topPanelRef.value) {
+        TOP_UI_HEIGHT.value = topPanelRef.value.offsetHeight || 96
+    }
+}
 const COLS = 64
 const ROWS = 9
 const REVEAL_RADIUS = 5
@@ -331,6 +338,7 @@ const initCanvas = () => {
     handleCanvasResize = () => {
         canvas.width = canvas.parentElement.clientWidth
         canvas.height = canvas.parentElement.clientHeight
+        updateTopUiHeight()
     }
     handleCanvasResize()
     window.addEventListener('resize', handleCanvasResize)
@@ -352,6 +360,9 @@ onMounted(() => {
     loadTextures()
     map = generateMap('heroes-might-music')
     startLoop()
+    nextTick(() => {
+        updateTopUiHeight()
+    })
 })
 
 onBeforeUnmount(() => {
@@ -391,6 +402,9 @@ const onInit = (state) => {
                 root.style.setProperty(key, value);
             }
         });
+        nextTick(() => {
+            updateTopUiHeight()
+        })
     }
 }
 
@@ -478,7 +492,7 @@ const startLoop = () => {
         const h = canvas.height
         const isDark = theme.value === 'dark'
 
-        const gameTopY = TOP_UI_HEIGHT
+        const gameTopY = TOP_UI_HEIGHT.value
         const gameBottomY = h - BOTTOM_UI_HEIGHT
         const playableHeight = Math.max(60, gameBottomY - gameTopY)
 
@@ -1391,10 +1405,10 @@ const handleCanvasSeek = (e) => {
     const clientY = e.touches ? e.touches[0].clientY : e.clientY
     const x = clientX - rect.left
     const y = clientY - rect.top
-    if (y < TOP_UI_HEIGHT || y > canvasRef.value.height - BOTTOM_UI_HEIGHT) return
+    if (y < TOP_UI_HEIGHT.value || y > canvasRef.value.height - BOTTOM_UI_HEIGHT) return
 
     const worldX = x + cameraX
-    const playableHeight = Math.max(60, canvasRef.value.height - TOP_UI_HEIGHT - BOTTOM_UI_HEIGHT)
+    const playableHeight = Math.max(60, canvasRef.value.height - TOP_UI_HEIGHT.value - BOTTOM_UI_HEIGHT)
     const size = getHexSize(playableHeight)
 
     let bestIdx = 0, bestDist = Infinity
@@ -1504,6 +1518,9 @@ const formatNumber = (num) => {
     width: 100%;
     height: 100%;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    user-select: none;
 }
 
 .ui-panel {
@@ -1526,6 +1543,7 @@ const formatNumber = (num) => {
     gap: 16px;
     border-bottom: 3px solid #7a5f3c;
     box-shadow: 0 2px 0 #c9a13a inset;
+    align-items: end;
     padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));
 }
 
