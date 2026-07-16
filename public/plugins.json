@@ -97,5 +97,15 @@
       "crop": "https://plugins.bilbomusic.com/img/plugin/crop/winamp-retro.jpg",
       "resized": "https://plugins.bilbomusic.com/img/plugin/resized/winamp-retro.jpg"
     }
+  },
+  {
+    "code": "six-seven",
+    "name": "Six Seven",
+    "description": "A bold, brutalist hardware-inspired hardware player layout. Features a rotating vinyl-style circular album cover, interactive neon multi-frequency progress bar, haptic screen-shaking feedback, full localized multi-language control translations, and a sticky responsive controller bar for play/pause, liking tracks, and track navigation.",    
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/six-seven.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/six-seven.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/six-seven.jpg"
+    }
   }
 ]

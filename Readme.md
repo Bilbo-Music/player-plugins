@@ -63,6 +63,7 @@ The repository contains 10 highly interactive and uniquely styled plugins, each 
 | **Sonic Rhythm Dash** 🦔 | `sonic-rhytm-dash` | A stylized infinite runner game. The blue hedgehog collects golden rings and jumps over spiked obstacles, with spawn rates and game speed matching the track's active tempo. |
 | **Audio Bounce Game** 🎮 | `audio-bounce` | A retro physics-based brick-breaker/pong game. The ball and paddles bounce off of frequency barriers generated live from the audio visualizer spectrum. |
 | **Yandex Gravity Simulator** 🛸 | `yandex-gravity` | An interactive physics canvas with zero gravity. Album covers, control cards, and badges float freely, colliding and responding to user drag-and-throw gestures. |
+| **Six-Seven Player** 🎛️ | `six-seven` | A bold, brutalist hardware-inspired hardware player layout. Features a rotating vinyl-style circular album cover, interactive neon multi-frequency progress bar, haptic screen-shaking feedback, full localized multi-language control translations, and a sticky responsive controller bar for play/pause, liking tracks, and track navigation. |
 
 ---
 

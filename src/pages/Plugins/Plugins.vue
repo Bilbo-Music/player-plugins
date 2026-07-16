@@ -24,7 +24,8 @@
         'audio-bounce': defineAsyncComponent(() => import('@/plugins/audio-bounce/AudioBounce.vue')),
         'lofi-cozy': defineAsyncComponent(() => import('@/plugins/lofi-cozy/LofiCozy.vue')),
         'winamp-retro': defineAsyncComponent(() => import('@/plugins/winamp-retro/WinampRetro.vue')),
-        'vultisig-vault': defineAsyncComponent(() => import('@/plugins/vultisig-vault/VultisigVault.vue'))
+        'vultisig-vault': defineAsyncComponent(() => import('@/plugins/vultisig-vault/VultisigVault.vue')),
+        'six-seven': defineAsyncComponent(() => import('@/plugins/six-seven/SixSeven.vue'))
     }
 
     const activeComponent = computed(() => {
