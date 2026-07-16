@@ -1346,6 +1346,16 @@ const onInit = (state) => {
         reaction.value = pane.reaction || ''
     }
   }
+
+  if (state?.styles) {
+    const root = document.documentElement;
+
+    Object.entries(state.styles).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        root.style.setProperty(key, value);
+      }
+    });
+  }
 }
 
 const onTrackChange = (payload) => {
@@ -1505,6 +1515,7 @@ onBeforeUnmount(() => {
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   padding: 16px;
   padding-bottom: 96px;
+  padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 16px)));
   color: #000000;
 }
 
