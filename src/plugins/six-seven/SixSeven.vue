@@ -345,52 +345,52 @@ import { playerSdk } from '@bilbomusic/player-plugin-sdk'
 // -----------------------------------------------------------------
 const locales = {
   "en-US": {
-    systemBadge: "🔥 GEN-Z CORE VIBE SYSTEM",
-    title: "SIX SEVEN Player",
-    description: "Default player of the new gen. Rating of literally everything: strictly 6-7 out of 10.",
-    imba: "GOAT!",
+    systemBadge: "🔥 CRITIC CORE RATING SYSTEM",
+    title: "SIX-SEVEN Player",
+    description: "The ultimate player for music critics and rating nerds. Rating of literally everything: strictly 6-7 out of 10.",
+    imba: "BASE!",
     nowPlaying: "NOW PLAYING",
     silence: "Silence in the air...",
-    unknownArtist: "Unknown Zoomer",
+    unknownArtist: "Obscure Noname",
     score: "RATING: 6-7/10",
     vibe: "VIBE: SIX-SEVEN",
     progressText: "PROGRESS: SIX SEVENTHS",
     spectrogram: "SPECTROGRAM \"SIX-SEVEN\" (6-7 BARS)",
     eqLabels: ["S (Bass)", "I", "X", "-", "S", "E", "V (Highs)"],
-    vibeMeterTitle: "🎛️ DYNAMIC VIBEMETER",
-    vibeMeterDesc: "Adjust your vibe level. Warning: system locked on the perfect vibe!",
+    vibeMeterTitle: "🎛️ DYNAMIC CRITIC-METER",
+    vibeMeterDesc: "Adjust your level of nitpicking and praise. Warning: system locked on the perfect score!",
     cringe: "0 (Cringe)",
-    imbaVibe: "6-7 (GOAT)",
-    gigachad: "10 (Gigachad)",
+    imbaVibe: "6-7 (Base)",
+    gigachad: "10 (Masterpiece)",
     vibeStatusPrefix: "Current status: ",
     vibeStatuses: {
-      imba: "GOAT (6.7 LOCK-IN)",
+      imba: "BASE (6.7 LOCK-IN)",
       cringe: "CRINGE",
-      dull: "MID",
-      sixSeven: "SIX SEVEN",
-      pon: "BET"
+      dull: "DULL",
+      sixSeven: "SIX-SEVEN",
+      pon: "SOLVED"
     },
-    excuseGeneratorTitle: "📝 ZOOMER EXCUSE GENERATOR",
-    excuseGeneratorDesc: "Need a solid excuse for your team lead or mom? Always blame 6-7.",
+    excuseGeneratorTitle: "📝 MUSIC CRITIC EXCUSE GENERATOR",
+    excuseGeneratorDesc: "Need a solid excuse for your review or lack of depth? Always blame 6-7.",
     generateExcuseBtn: "GENERATE EXCUSE",
     excuses: [
-      "I will be late by like 6-7 hours, suddenly got depressed.",
-      "I only have 6-7 lines of code left to write, but I'm completely burnt out.",
-      "Had 6-7 panic attacks yesterday, so I'm in full tilt mode today.",
-      "Got 6-7 missed calls from mom. If I don't survive, sell my playlist.",
-      "My mental age right now is like 6-7 years old. Don't touch me.",
-      "I rate this task strictly 6-7 cringes out of 10.",
-      "This track is such a bop, played it 6-7 times in a row this morning.",
-      "Like 6-7 times today I wanted to quit my job and move to Thailand."
+      "I listened to the LP, it's a solid 6-7, but the charisma was completely missing.",
+      "The mix is a 6-7, the vocals are buried in the track.",
+      "The lyrics are a 6-7, just generic rhymes about heartbreak.",
+      "I have 6-7 missed calls from the beatmaker. If I don't survive, sell my vinyl collection.",
+      "My disappointment is immeasurable, and my rating is strictly a 6-7.",
+      "I rate this task strictly 6-7 out of 10 on structure.",
+      "This track is such a mid, I've replayed it 6-7 times trying to find any substance.",
+      "Like 6-7 times today I wanted to delete my review blog and move to Thailand."
     ],
-    expertVerdictIntro: "Listen, bro. I analyzed your playlist, internet speed, moon phase, and tilt level. My expert verdict on this is...",
+    expertVerdictIntro: "Listen, bro. I analyzed your playlist, mixing, rhymes, and level of dullness. My expert verdict is...",
     askExpertBtn: "🗣️ ASK EXPERT",
     synthBtn: "🎹 '6-7' SYNTHESIZER",
     expertVerdicts: [
       "Well, about six-seven.",
       "Strictly six-seven out of ten, pure default.",
-      "Not cringe, but not gigachad either. About six-seven.",
-      "Six-seven seconds and you are tilted, bro.",
+      "Not cringe, but not a masterpiece. About six-seven.",
+      "Six-seven seconds of listening and you are tilted, bro.",
       "Certified bop at sixty-seven percent!",
       "I see. My rating: ironclad 6.7!"
     ],
@@ -399,62 +399,62 @@ const locales = {
     notchInset: "NOTCH INSET TOP:",
     systemState: "SYSTEM STATE:",
     themeStyling: "THEME STYLING:",
-    playingKaif: "PLAYING (VIBING)",
-    pausedDust: "PAUSED (IDLE)",
+    playingKaif: "PLAYING (KAIF)",
+    pausedDust: "PAUSED (DUST)",
     prevBtnTitle: "This way (Prev)",
     nextBtnTitle: "That way (Next)",
-    playBtn: "VIBE",
-    pauseBtn: "CHILL"
+    playBtn: "BOP",
+    pauseBtn: "MID"
   },
   "ru-RU": {
-    systemBadge: "🔥 GEN-Z CORE VIBE SYSTEM",
-    title: "ШЕСТЬ СЕМЬ Player",
-    description: "Дефолтный плеер нового поколения зумеров. Оценка всего на свете: строго 6-7 из 10.",
-    imba: "ИМБА!",
+    systemBadge: "🔥 СИСТЕМА ОЦЕНКИ SIX-SEVEN",
+    title: "SIX-SEVEN Player",
+    description: "Дефолтный плеер для настоящих ценителей и музыкальных критиков. Оценка всего на свете: строго 6-7 из 10.",
+    imba: "БАЗА!",
     nowPlaying: "СЕЙЧАС ИГРАЕТ",
     silence: "Тишина в эфире...",
-    unknownArtist: "Неизвестный зумер",
+    unknownArtist: "Очередной ноунейм",
     score: "ОЦЕНКА: 6-7/10",
-    vibe: "ВАЙБ: ШЕСТЬ-СЕМЬ",
+    vibe: "ВАЙБ: SIX-SEVEN",
     progressText: "ПРОГРЕСС: ШЕСТЬ СЕМЫХ",
-    spectrogram: "СПЕКТРОГРАММА \"ШЕСТЬ-СЕМЬ\" (6-7 СТОЛБЦОВ)",
-    eqLabels: ["Ш (Bass)", "Е", "С", "Т", "Ь", "-", "7 (Highs)"],
-    vibeMeterTitle: "🎛️ ДИНАМИЧЕСКИЙ КАЙФОМЕТР",
-    vibeMeterDesc: "Настрой уровень кайфа. Осторожно: система заблокирована на идеальном вайбе!",
+    spectrogram: "СПЕКТРОГРАММА \"SIX-SEVEN\" (6-7 СТОЛБЦОВ)",
+    eqLabels: ["S (Bass)", "I", "X", "-", "S", "E", "V (Highs)"],
+    vibeMeterTitle: "🎛️ ДИНАМИЧЕСКИЙ КРИТИКОМЕТР",
+    vibeMeterDesc: "Настрой уровень душноты и базы. Осторожно: система заблокирована на идеальной оценке!",
     cringe: "0 (Кринж)",
-    imbaVibe: "6-7 (ИМБА)",
-    gigachad: "10 (Гигачад)",
+    imbaVibe: "6-7 (База)",
+    gigachad: "10 (Вышка)",
     vibeStatusPrefix: "Текущий статус: ",
     vibeStatuses: {
-      imba: "ИМБА (6.7 LOCK-IN)",
+      imba: "БАЗА (6.7 LOCK-IN)",
       cringe: "КРИНЖ",
       dull: "ДУШНО",
-      sixSeven: "ШЕСТЬ СЕМЬ",
-      pon: "ПОН"
+      sixSeven: "SIX-SEVEN",
+      pon: "РЕШЕНО"
     },
-    excuseGeneratorTitle: "📝 ГЕНЕРАТОР ЗУМЕРСКИХ ОТМАЗОК",
-    excuseGeneratorDesc: "Нужна железобетонная отмазка для тимлида или мамы? Всегда ссылайся на 6-7.",
-    generateExcuseBtn: "СГЕНЕРИРОВАТЬ ОТМАЗКУ",
+    excuseGeneratorTitle: "📝 ГЕНЕРАТОР ОПРАВДАНИЙ РЕЦЕНЗЕНТА",
+    excuseGeneratorDesc: "Нужно оправдание перед подписчиками или артистом? Всегда ссылайся на 6-7.",
+    generateExcuseBtn: "СГЕНЕРИРОВАТЬ ОПРАВДАНИЕ",
     excuses: [
-      "Я опоздаю на встречу где-то на 6-7 часов, у меня внезапная депрессия.",
-      "Мне осталось написать 6-7 строчек кода, но я уже жестко выгорел.",
-      "Вчера у меня было 6-7 панических атак, так что я сегодня в тильте.",
-      "У меня 6-7 пропущенных от мамы. Если не выживу — продайте мой плейлист.",
-      "Мой ментальный возраст сейчас — где-то 6-7 лет. Не трогайте меня.",
-      "Оцениваю эту задачу строго на 6-7 кринжей из 10.",
-      "Этот трек настолько имбовый, что я переслушал его 6-7 раз подряд за утро.",
-      "Где-то 6-7 раз за сегодня я хотел уволиться и уехать в Таиланд."
+      "Я послушал альбом, это крепкие 6-7, но харизма просела.",
+      "Мне осталось написать 6-7 строчек рецензии, но я уже жестко устал душнить.",
+      "Сведение трека максимум на 6-7, капу вообще не слышно в миксе.",
+      "У меня 6-7 пропущенных от оскорбленного рэпера. Если не выживу — продайте мой плейлист.",
+      "Текст трека на уровне 6-7 летнего ребенка. Рифмы на глаголы.",
+      "Оцениваю этот релиз строго на 6-7 по структуре и ритмике.",
+      "Этот трек настолько средний, что я поставил ему 6-7 по атмосфере.",
+      "Где-то 6-7 раз за сегодня я хотел удалить свой паблик с рецензиями и уехать в Таиланд."
     ],
-    expertVerdictIntro: "Слушай, бро. Я проанализировал твой плейлист, скорость интернет-соединения, фазу луны и твой уровень тильта. Мой экспертный вердикт по этой теме...",
+    expertVerdictIntro: "Слушай, бро. Я проанализировал твой плейлист, сведение треков, рифмы и уровень духоты. Мой экспертный вердикт...",
     askExpertBtn: "🗣️ СПРОСИТЬ ЭКСПЕРТА",
     synthBtn: "🎹 СИНТЕЗАТОР \"6-7\"",
     expertVerdicts: [
       "Ну где-то шесть-семь.",
       "Строго шесть-семь из десяти, чистый дефолт.",
-      "Не кринж, но и не гигачад. Где-то шесть-семь.",
-      "Шесть-семь секунд и ты в тильте, бро.",
-      "Имба на шестьдесят семь процентов!",
-      "Пон. Моя оценка: железобетонные 6.7!"
+      "Не кринж, но и не классика. Где-то шесть-семь.",
+      "Шесть-семь секунд прослушивания — и всё понятно, выключай.",
+      "Крепкий средняк на шестьдесят семь процентов!",
+      "Понятно. Моя оценка: железобетонные 6.7!"
     ],
     systemStatusTitle: "🗃️ СИСТЕМНЫЙ СТАТУС В ОФИЦИАЛЬНОЙ SDK",
     currentUser: "CURRENT USER:",
@@ -465,12 +465,12 @@ const locales = {
     pausedDust: "PAUSED (DUST)",
     prevBtnTitle: "Сюда (Prev)",
     nextBtnTitle: "Туда (Next)",
-    playBtn: "КАЙФОВАТЬ",
-    pauseBtn: "ДУШНИТЬ"
+    playBtn: "КАЙФ",
+    pauseBtn: "ДУШНО"
   },
   "zh-CN": {
     systemBadge: "🔥 Z世代核心潮流系统",
-    title: "六 七 播放器",
+    title: "SIX-SEVEN Player",
     description: "Z世代默认播放器。评价万物：严格在10分中打6-7分。",
     imba: "绝了!",
     nowPlaying: "正在播放",
@@ -532,7 +532,7 @@ const locales = {
   },
   "fr-FR": {
     systemBadge: "🔥 SYSTEME D'AMBIANCE GEN-Z",
-    title: "SIX SEPT Lecteur",
+    title: "SIX-SEVEN Player",
     description: "Le lecteur par défaut de la nouvelle génération. Note sur tout : strictement 6-7 sur 10.",
     imba: "INCROYABLE !",
     nowPlaying: "LECTURE EN COURS",
@@ -594,7 +594,7 @@ const locales = {
   },
   "de-DE": {
     systemBadge: "🔥 GEN-Z VIBE-SYSTEM",
-    title: "SECHS SIEBEN Player",
+    title: "SIX-SEVEN Player",
     description: "Standard-Player der neuen Generation. Bewertung von allem: strikt 6-7 von 10.",
     imba: "KRASS!",
     nowPlaying: "JETZT SPIELT",
@@ -656,7 +656,7 @@ const locales = {
   },
   "it-IT": {
     systemBadge: "🔥 SISTEMA VIBE GEN-Z",
-    title: "SEI SETTE Player",
+    title: "SIX-SEVEN Player",
     description: "Il player predefinito della nuova generazione. Voto su tutto: rigorosamente 6-7 su 10.",
     imba: "ASSURDO!",
     nowPlaying: "IN RIPRODUZIONE",
@@ -718,7 +718,7 @@ const locales = {
   },
   "ja-JP": {
     systemBadge: "🔥 Z世代コア・バイブ・システム",
-    title: "シックスセブン プレイヤー",
+    title: "SIX-SEVEN Player",
     description: "新世代のデフォルトプレーヤー。あらゆる評価は、厳しく10点中6〜7点。",
     imba: "ヤバい！",
     nowPlaying: "再生中",
@@ -780,7 +780,7 @@ const locales = {
   },
   "pt-BR": {
     systemBadge: "🔥 SISTEMA VIBE GEN-Z",
-    title: "SEIS SETE Player",
+    title: "SIX-SEVEN Player",
     description: "Player padrão da nova geração. Avaliação de tudo: estritamente 6-7 de 10.",
     imba: "INSANO!",
     nowPlaying: "REPRODUZINDO AGORA",
@@ -842,7 +842,7 @@ const locales = {
   },
   "es-ES": {
     systemBadge: "🔥 SISTEMA VIBE GEN-Z",
-    title: "SEIS SIETE Player",
+    title: "SIX-SEVEN Player",
     description: "Reproductor por defecto de la nueva generación. Nota de todo: estrictamente 6-7 de 10.",
     imba: "¡AL MÁXIMO!",
     nowPlaying: "REPRODUCIENDO",
@@ -904,7 +904,7 @@ const locales = {
   },
   "ko-KR": {
     systemBadge: "🔥 Z세대 핵심 바이브 시스템",
-    title: "식스 세븐 플레이어",
+    title: "SIX-SEVEN Player",
     description: "새로운 세대의 기본 플레이어. 세상 만사의 평점은 엄격하게 10점 만점에 6~7점.",
     imba: "대박!",
     nowPlaying: "현재 재생 중",
@@ -966,7 +966,7 @@ const locales = {
   },
   "ar-AE": {
     systemBadge: "🔥 نظام فايب الجيل زد الأساسي",
-    title: "مشغل ستة سبعة",
+    title: "SIX-SEVEN Player",
     description: "المشغل الافتراضي لجيل زد الجديد. تقييم كل شيء: 6-7 من 10 بالضبط.",
     imba: "رهيب!",
     nowPlaying: "يعمل الآن",
@@ -1140,11 +1140,11 @@ const startProgressSimulation = () => {
   stopProgressSimulation()
   progressInterval = setInterval(() => {
     if (isPlaying.value) {
-      playedMs.value += 1000
-      if (playedMs.value >= durationMs.value) {
-        playedMs.value = 0
-        playerSdk.next()
-      }
+      // playedMs.value += 1000
+      // if (playedMs.value >= durationMs.value) {
+      //   playedMs.value = 0
+      //   playerSdk.next()
+      // }
     }
   }, 1000)
 }
@@ -1271,6 +1271,7 @@ const askExpert = () => {
       utterance.lang = activeLocale.value
       utterance.rate = 1.1
       utterance.pitch = 0.95
+      utterance.volume = 1
       window.speechSynthesis.speak(utterance)
     } catch (err) {
       console.warn('SpeechSynthesis blocked by permissions/sandbox', err)
@@ -1298,7 +1299,7 @@ const triggerBeepSynth = (freq = 670, duration = 0.15) => {
     osc1.frequency.setValueAtTime(freq, audioCtx.currentTime)
     osc2.frequency.setValueAtTime(freq * 1.16, audioCtx.currentTime + 0.1) // 7/6 ratio is ~1.166! Perfect!
     
-    gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime)
+    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime)
     gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration * 2)
     
     osc1.connect(gainNode)
@@ -1371,6 +1372,10 @@ const onTrackChange = (payload) => {
   }
 }
 
+const onPosition = (payload) => {
+  playedMs.value = payload.position;
+}
+
 const onThemeChange = (payload) => {
   if (payload?.theme) theme.value = payload.theme
 }
@@ -1424,6 +1429,7 @@ onMounted(() => {
   playerSdk.on('init', onInit)
   playerSdk.on('locale', onLocaleChange)
   playerSdk.on('open', onTrackChange, 'default')
+  playerSdk.on('position', onPosition)
   playerSdk.on('state', onStateChange, 'default')
   playerSdk.on('theme', onThemeChange)
   playerSdk.on('player', onPlayerChange)
@@ -1474,6 +1480,7 @@ onBeforeUnmount(() => {
   playerSdk.off('init', onInit)
   playerSdk.off('locale', onLocaleChange)
   playerSdk.off('open', onTrackChange, 'default')
+  playerSdk.off('position', onPosition)
   playerSdk.off('state', onStateChange, 'default')
   playerSdk.off('theme', onThemeChange)
   playerSdk.off('player', onPlayerChange)
@@ -2062,6 +2069,9 @@ onBeforeUnmount(() => {
   border-radius: 6px;
   text-align: center;
   box-shadow: 2px 2px 0px #000000;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .status-label {
@@ -2077,6 +2087,7 @@ onBeforeUnmount(() => {
   padding: 2px 6px;
   border-radius: 4px;
   border: 1px solid #818cf8;
+  white-space: nowrap;
 }
 
 /* Excuse Generator Card */
