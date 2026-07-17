@@ -410,7 +410,7 @@ const locales = {
     systemBadge: "🔥 СИСТЕМА ОЦЕНКИ SIX-SEVEN",
     title: "SIX-SEVEN Player",
     description: "Дефолтный плеер для настоящих ценителей и музыкальных критиков. Оценка всего на свете: строго 6-7 из 10.",
-    imba: "БАЗА!",
+    imba: "ИМБА!",
     nowPlaying: "СЕЙЧАС ИГРАЕТ",
     silence: "Тишина в эфире...",
     unknownArtist: "Очередной ноунейм",
@@ -426,7 +426,7 @@ const locales = {
     gigachad: "10 (Вышка)",
     vibeStatusPrefix: "Текущий статус: ",
     vibeStatuses: {
-      imba: "БАЗА (6.7 LOCK-IN)",
+      imba: "ИМБА (6.7 LOCK-IN)",
       cringe: "КРИНЖ",
       dull: "ДУШНО",
       sixSeven: "SIX-SEVEN",
