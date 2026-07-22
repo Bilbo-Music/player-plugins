@@ -27,21 +27,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Top Right Action Controls: Playlist Queue -->
-      <div class="top-actions font-mono">
-        <button 
-          class="roblox-top-btn playlist-btn" 
-          :disabled="!hasQueue" 
-          @click="playerSdk.openPlaylist()" 
-          title="Open Playlist Queue"
-        >
-          <svg class="btn-svg-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18C16.69 14.07 16.35 14 16 14c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z" />
-          </svg>
-          <span class="hidden sm:inline">{{ t.queue }}</span>
-        </button>
-      </div>
     </div>
 
     <!-- 3D THREE.JS CANVAS (Roblox World & Dancing Avatar) -->
@@ -200,6 +185,18 @@
             <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" />
           </svg>
           <span v-if="repeatMode === 'track'" class="repeat-one-badge">1</span>
+        </button>
+
+        <!-- Playlist Queue Button -->
+        <button 
+          class="roblox-ctrl-btn playlist-btn" 
+          :disabled="!hasQueue" 
+          @click="playerSdk.openPlaylist()" 
+          title="Open Playlist Queue"
+        >
+          <svg class="ctrl-svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18C16.69 14.07 16.35 14 16 14c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z" />
+          </svg>
         </button>
       </div>
     </div>
@@ -1574,7 +1571,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 10px;
-  max-width: 75%;
+  max-width: 100%;
   overflow: hidden;
 }
 

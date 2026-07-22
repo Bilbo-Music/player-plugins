@@ -8,9 +8,9 @@
     </div>
 
     <!-- MAIN PLAYER SCREEN -->
-    <div class="audius-player-screen">
+    <div class="audius-player-screen" :style="{ paddingTop: topUiHeight ? topUiHeight + 'px' : undefined }">
       <!-- 1. TOP NAVBAR -->
-      <header class="audius-header">
+      <header ref="topPanelRef" class="audius-header">
         <!-- Collapse / Minimize Button -->
         <button class="nav-icon-btn collapse-btn" title="Minimize Player" @click="handleMinimize">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -225,6 +225,19 @@ const hasQueue = ref(true)
 const toastMessage = ref('')
 let toastTimer = null
 
+// Top UI Height
+const topPanelRef = ref(null)
+const topUiHeight = ref(60)
+
+const updateTopUiHeight = () => {
+  if (topPanelRef.value) {
+    topUiHeight.value = topPanelRef.value.offsetHeight || 60
+    if (typeof playerSdk.updateTopUiHeight === 'function') {
+      playerSdk.updateTopUiHeight(topUiHeight.value)
+    }
+  }
+}
+
 // Canvas Visualizer
 const canvasRef = ref(null)
 let audioFrequencies = new Array(32).fill(0.15)
@@ -373,6 +386,19 @@ const onInit = (state) => {
   if (!state) return
   if (state.theme) theme.value = state.theme
 
+  if (state?.styles) {
+    const root = document.documentElement;
+
+    Object.entries(state.styles).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        root.style.setProperty(key, value);
+      }
+    });
+    nextTick(() => {
+      updateTopUiHeight()
+    })
+  }
+
   const pane = state.panes?.default
   if (pane) {
     if (pane.track) {
@@ -387,6 +413,7 @@ const onInit = (state) => {
     if ('prevDisabled' in pane) prevDisabled.value = !!pane.prevDisabled
     if ('hasQueue' in pane) hasQueue.value = !!pane.hasQueue
   }
+  nextTick(() => updateTopUiHeight())
 }
 
 const onOpen = (payload) => {
@@ -395,6 +422,7 @@ const onOpen = (payload) => {
     durationMs.value = payload.track.duration || 225000
     playedMs.value = payload.position || 0
   }
+  nextTick(() => updateTopUiHeight())
 }
 
 const onPosition = (payload) => {
@@ -484,7 +512,10 @@ onMounted(() => {
     onInit(playerSdk.state)
   }
 
+  window.addEventListener('resize', updateTopUiHeight)
+
   nextTick(() => {
+    updateTopUiHeight()
     startSpectrumVisualizer()
   })
 })
@@ -499,6 +530,8 @@ onBeforeUnmount(() => {
   playerSdk.off('repeat', onRepeat)
   playerSdk.off('change', onChange)
   playerSdk.off('audioFrame', onAudioFrame, 'default')
+
+  window.removeEventListener('resize', updateTopUiHeight)
 
   if (animFrameId) cancelAnimationFrame(animFrameId)
 })
