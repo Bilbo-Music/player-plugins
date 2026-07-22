@@ -436,7 +436,7 @@ const currentAvatarStyle = computed(() => avatarPresets[currentStyleIdx.value])
 // 2. COMPUTED HELPERS & ACTIONS
 // -----------------------------------------------------------------
 const topbarSafeStyle = computed(() => ({
-  paddingTop: 'calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)))'
+  paddingTop: 'calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 8px)'
 }))
 
 const trackTitle = computed(() => currentTrack.value?.title || t.value.silence)
@@ -1560,7 +1560,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
+  padding: 10px 74px 10px 14px;
   background: rgba(16, 18, 24, 0.92);
   backdrop-filter: blur(12px);
   border-bottom: 2px solid #e2231a;
