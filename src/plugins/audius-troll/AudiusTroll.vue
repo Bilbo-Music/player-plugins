@@ -8,7 +8,7 @@
     </div>
 
     <!-- MAIN PLAYER SCREEN -->
-    <div class="audius-player-screen" :style="{ paddingTop: topUiHeight ? topUiHeight + 'px' : undefined }">
+    <div class="audius-player-screen">
       <!-- 1. TOP NAVBAR -->
       <header ref="topPanelRef" class="audius-header">
         <!-- Collapse / Minimize Button -->
@@ -239,7 +239,7 @@ const updateTopUiHeight = () => {
 }
 
 const topbarSafeStyle = computed(() => ({
-  paddingTop: 'calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 8px)'
+  paddingTop: 'calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)))'
 }))
 
 // Canvas Visualizer
