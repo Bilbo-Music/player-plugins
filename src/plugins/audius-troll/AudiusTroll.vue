@@ -1,5 +1,5 @@
 <template>
-  <div class="audius-app-container" :class="[theme]" :style="topbarSafeStyle">
+  <div class="audius-app-container">
     <!-- BACKGROUND GLOW EFFECTS -->
     <div class="audius-bg-glow">
       <div class="glow-orb top-orb"></div>
@@ -214,10 +214,6 @@ const updateTopUiHeight = () => {
     }
   }
 }
-
-const topbarSafeStyle = computed(() => ({
-  paddingTop: 'calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)))'
-}))
 
 // Canvas Visualizer
 const canvasRef = ref(null)
@@ -533,6 +529,7 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: center;
   box-sizing: border-box;
+  padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));
 
   -webkit-tap-highlight-color: transparent !important;
   -webkit-touch-callout: none;
@@ -652,6 +649,9 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: center;
   padding: 4px 0;
+  max-width: 250px;
+  aspect-ratio: 1 / 1;
+  margin: auto;
 }
 
 .artwork-card {
