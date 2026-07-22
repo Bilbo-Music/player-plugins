@@ -1,6 +1,5 @@
 <template>
   <div class="roblox-container" :class="[theme]">
-    <!-- TOP HEADER: Roblox Topbar with Safe Area Insets -->
     <div ref="topPanelRef" class="roblox-topbar" :style="topbarSafeStyle">
       <!-- Track Info & Cover -->
       <div class="track-info-group" @click="playerSdk.openTrackKebab()">
