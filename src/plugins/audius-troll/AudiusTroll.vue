@@ -1,5 +1,5 @@
 <template>
-  <div class="audius-app-container" :class="[theme]">
+  <div class="audius-app-container" :class="[theme]" :style="topbarSafeStyle">
     <!-- BACKGROUND GLOW EFFECTS -->
     <div class="audius-bg-glow">
       <div class="glow-orb top-orb"></div>
@@ -237,6 +237,10 @@ const updateTopUiHeight = () => {
     }
   }
 }
+
+const topbarSafeStyle = computed(() => ({
+  paddingTop: 'calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 8px)'
+}))
 
 // Canvas Visualizer
 const canvasRef = ref(null)
