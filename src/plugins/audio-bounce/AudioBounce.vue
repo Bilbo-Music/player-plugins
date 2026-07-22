@@ -2,7 +2,7 @@
     <div class="bounce-container" :class="[theme]" id="ab-app-container">
         <!-- TOP TRACK META PANEL -->
         <div ref="topPanelRef" class="ab-top-panel" id="ab-top-panel">
-            <div class="ab-track-card" id="ab-track-card">
+            <div class="ab-track-card" id="ab-track-card" @click="playerSdk.openTrackKebab()">
                 <div class="ab-cover-wrapper" id="ab-cover-wrapper">
                     <img
                         v-if="trackInfo.cover?.crop"

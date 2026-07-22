@@ -91,7 +91,7 @@
     "code": "winamp-retro",
     "name": "Winamp RETRO",
     "description": "A nostalgic tribute to the legendary 90s player. Features classic pixel equalizers, spinning cassette reels, custom skin styling, and authentic vintage control buttons.",
-	"category": "visualizer",    
+	  "category": "visualizer",    
     "cover": {
       "original": "https://plugins.bilbomusic.com/img/plugin/original/winamp-retro.jpg",
       "crop": "https://plugins.bilbomusic.com/img/plugin/crop/winamp-retro.jpg",
@@ -102,10 +102,33 @@
     "code": "six-seven",
     "name": "Six Seven",
     "description": "A bold, brutalist hardware-inspired hardware player layout. Features a rotating vinyl-style circular album cover, interactive neon multi-frequency progress bar, haptic screen-shaking feedback, full localized multi-language control translations, and a sticky responsive controller bar for play/pause, liking tracks, and track navigation.",    
+    "category": "visualizer",    
     "cover": {
       "original": "https://plugins.bilbomusic.com/img/plugin/original/six-seven.jpg",
       "crop": "https://plugins.bilbomusic.com/img/plugin/crop/six-seven.jpg",
       "resized": "https://plugins.bilbomusic.com/img/plugin/resized/six-seven.jpg"
+    }
+  },
+  {
+    "code": "roblox-blox-party",
+    "name": "Roblox Blox Party",
+    "category": "visualizer",    
+    "description": "An immersive 3D Roblox disco stage with real-time audio rhythm sync! Features a customizable 3D Roblox character (Classic Noob, Bacon Hair, Dominus Lord, Sparkle Fedora, Korblox Ice) performing 9 realistic dance styles (Hip-Hop, Disco, Shuffle, Floss, Windmill Spin, Robot Wave, Orange Justice, Hype Bounce, Carlton Swing). Advanced beat-matching locks dance movements to track position and drum kick transients, paired with 4 dynamic 3D Roblox world themes (Neon Cyber, Classic Spawn, Space Station, Sunset Metropolis), floating Obby platforms, Robux coins, overhead disco ball & scanning lasers, 3D floor stud equalizer columns, multi-language localization (RU, EN, TR, ES, DE), and interactive Web Audio SFX.",    
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/roblox-blox-party.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/roblox-blox-party.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/roblox-blox-party.jpg"
+    }
+  },
+  {
+    "code": "audius-troll",
+    "name": "Audius Parody Player",
+    "category": "visualizer",    
+    "description": "A satirical Web3 crypto-music skin parodying the Audius streaming platform. Features signature purple neon aesthetics, live $AUDIO token wallet balance, free $AUDIO Airdrop claimer with floating coin particles, VIP Staked Bagholder tier badge switcher, Solana Node #420 latency status, $AUDIO tipping sfx, fake Solana NFT minting engine modal, on-chain DAO governance voting proposal, 32-band audio spectrum visualizer, and 5-language localization (RU, EN, TR, ES, DE).",    
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/audius-troll.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/audius-troll.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/audius-troll.jpg"
     }
   }
 ]

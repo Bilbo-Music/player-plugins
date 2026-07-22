@@ -141,7 +141,7 @@
                     <button class="ctrl-btn btn-next" @click="playerSdk.next()" title="Next" id="winamp-btn-next">
                         <span>⏭</span>
                     </button>
-                    <button class="ctrl-btn btn-eject" @click="triggerEject" title="Eject (Mock Upload)" id="winamp-btn-eject">
+                    <button class="ctrl-btn btn-eject" @click="playerSdk.openTrackKebab()" title="Eject (Mock Upload)" id="winamp-btn-eject">
                         <span>⏏</span>
                     </button>
                 </div>

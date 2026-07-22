@@ -14,7 +14,7 @@
 
         <!-- TOP PANEL: Yandex Music style header with plugin spacer -->
         <div ref="topPanelRef" class="ui-panel top-panel">
-            <div class="track-card">
+            <div class="track-card" @click="playerSdk.openTrackKebab()">
                 <div class="track-cover" :class="{ 'is-loading': !isCoverLoaded }">
                     <img 
                         v-if="trackInfo.cover?.crop"

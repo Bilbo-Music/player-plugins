@@ -2,7 +2,7 @@
     <div class="lofi-container" :class="[theme]" id="lofi-app-container">
         <!-- COZY TRACK HEADER PANEL -->
         <div ref="topPanelRef" class="lofi-top-panel" id="lofi-top-panel">
-            <div class="lofi-track-card" id="lofi-track-card">
+            <div class="lofi-track-card" id="lofi-track-card" @click="playerSdk.openTrackKebab()">
                 <div class="lofi-cover-wrapper" id="lofi-cover-wrapper">
                     <img
                         v-if="trackInfo.cover?.crop"

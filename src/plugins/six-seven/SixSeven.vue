@@ -21,7 +21,7 @@
 
         <div class="track-inner-layout">
           <!-- Album Cover -->
-          <div class="album-cover-wrapper">
+          <div class="album-cover-wrapper" @click="playerSdk.openTrackKebab()">
             <img 
               :src="currentTrack?.cover?.resized || 'https://picsum.photos/seed/music/300/300'" 
               alt="Track Cover" 

@@ -2,7 +2,7 @@
     <div class="nebula-container" :class="[theme]" id="neb-app-container">
         <!-- TOP TRACK INFO BAR -->
         <div ref="topPanelRef" class="neb-top-panel" id="neb-top-panel">
-            <div class="neb-track-card" id="neb-track-card">
+            <div class="neb-track-card" id="neb-track-card" @click="playerSdk.openTrackKebab()">
                 <div class="neb-cover-wrapper" id="neb-cover-wrapper">
                     <img
                         v-if="trackInfo.cover?.crop"

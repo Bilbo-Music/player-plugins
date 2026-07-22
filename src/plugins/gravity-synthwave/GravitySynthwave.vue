@@ -4,7 +4,7 @@
 
         <!-- TOP PANEL: track info -->
         <div ref="topPanelRef" class="ui-panel top-panel" id="gd-top-panel">
-            <div class="track-card" id="gd-track-card">
+            <div class="track-card" id="gd-track-card"  @click="playerSdk.openTrackKebab()">
                 <div class="track-cover" id="gd-track-cover">
                     <img
                         v-if="trackInfo.cover?.crop"

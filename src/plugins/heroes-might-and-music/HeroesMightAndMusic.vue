@@ -10,7 +10,7 @@
 
         <!-- TOP PANEL: scroll banner with track "portrait" -->
         <div ref="topPanelRef" class="ui-panel top-panel">
-            <div class="track-card">
+            <div class="track-card" @click="playerSdk.openTrackKebab()">
                 <div class="portrait-frame">
                     <div class="track-cover" :class="{ 'is-loading': !isCoverLoaded }">
                         <img

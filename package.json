@@ -9,6 +9,7 @@
     },
     "dependencies": {
         "@bilbomusic/player-plugin-sdk": "^1.0.0",
+        "three": "^0.185.1",
         "vue": "^3.4.0",
         "vue-router": "^4.6.4"
     },
