@@ -772,16 +772,15 @@ const handleRepeatToggle = () => {
 }
 
 const toggleLike = () => {
+    const target = isLiked.value ? '' : 'LIKE'
+    playerSdk.reaction(target);
+    
     isLiked.value = !isLiked.value
+
+
     if (isLiked.value) {
-        if (playerSdk && typeof playerSdk.like === 'function') {
-            playerSdk.like()
-        }
         showToast('♥ Co-signed & saved track locally inside MPC secure bookmarks!')
     } else {
-        if (playerSdk && typeof playerSdk.dislike === 'function') {
-            playerSdk.dislike()
-        }
         showToast('Track removed from vault bookmarks.')
     }
 }
