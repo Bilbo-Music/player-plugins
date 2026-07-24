@@ -556,7 +556,7 @@
             </main>
 
             <!-- BOTTOM TAB NAVIGATION MENU BAR -->
-            <div class="bottom-tab-menu-bar" id="vultisig-bottom-menu">
+            <div class="bottom-tab-menu-bar" id="vultisig-bottom-menu" style="display: none;">
                 <div class="bottom-tab-content">
                     <button 
                         @click="switchTab('flight')"
@@ -1815,7 +1815,7 @@ onMounted(() => {
     padding: 14px 20px;
     z-index: 30;
     position: relative;
-    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 22px);
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 14px);
 }
 
 .header-content {

@@ -27,7 +27,8 @@
         'vultisig-vault': defineAsyncComponent(() => import('@/plugins/vultisig-vault/VultisigVault.vue')),
         'six-seven': defineAsyncComponent(() => import('@/plugins/six-seven/SixSeven.vue')),
         'roblox-blox-party': defineAsyncComponent(() => import('@/plugins/roblox-blox-party/RobloxBloxParty.vue')),
-        'audius-troll': defineAsyncComponent(() => import('@/plugins/audius-troll/AudiusTroll.vue'))
+        'audius-troll': defineAsyncComponent(() => import('@/plugins/audius-troll/AudiusTroll.vue')),
+        'gunwest-chat': defineAsyncComponent(() => import('@/plugins/gunwest-chat/GunwestChat.vue'))
     }
 
     const activeComponent = computed(() => {

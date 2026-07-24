@@ -8,7 +8,8 @@
         "build": "vite build"
     },
     "dependencies": {
-        "@bilbomusic/player-plugin-sdk": "^1.0.0",
+        "@bilbomusic/player-plugin-sdk": "^1.0.2",
+        "firebase": "^12.16.0",
         "three": "^0.185.1",
         "vue": "^3.4.0",
         "vue-router": "^4.6.4"
