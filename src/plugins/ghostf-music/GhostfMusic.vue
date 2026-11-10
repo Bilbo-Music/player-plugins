@@ -1678,6 +1678,13 @@ const openPlaylist = () => {
 </script>
 
 <style scoped>
+* {
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    user-select: none !important;
+}
+
+  
 .gf-container {
   position: fixed;
   top: 0;
