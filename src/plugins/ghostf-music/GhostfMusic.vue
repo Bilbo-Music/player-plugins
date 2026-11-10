@@ -214,7 +214,7 @@ const playerState = ref('paused')
 const reaction = ref('')
 const nextDisabled = ref(false)
 const prevDisabled = ref(false)
-const soundEnabled = ref(true)
+const soundEnabled = ref(false)
 
 // Audio analysis values
 const audioData = reactive({
@@ -1568,9 +1568,6 @@ onMounted(() => {
                 root.style.setProperty(key, value);
             }
         });
-        nextTick(() => {
-            updateTopUiHeight()
-        })
     }
   }
 
@@ -1908,8 +1905,10 @@ const openPlaylist = () => {
 
 @media (max-width: 768px) {
   .gf-header {
-    top: calc(34px + var(--tg-safe-area-inset-top, 0px));
+    top: 16px; 
+/*    //calc(34px + var(--tg-safe-area-inset-top, 0px));*/
     padding: 0 16px;
+    padding-top: calc(var(--max-safe-area-inset-top, var(--tg-safe-area-inset-top, 0px)) + var(--max-content-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)));
   }
 }
 
