@@ -321,8 +321,10 @@ const hero = {
   vy: 0,
   baseX: 0,
   baseY: 0,
-  width: 96,
-  height: 122,
+  // width: 96,
+  width: 48,
+  height: 61,
+  // height: 122,
   angle: 0,
   targetAngle: 0,
   
@@ -766,6 +768,7 @@ const drawGhostCharacter = (ctx, x, y, angle, isScared, scareIntensity) => {
   ctx.save()
   ctx.translate(x, y)
   ctx.rotate(angle)
+  ctx.scale(0.5, 0.5)
 
   // Audio bounce squash & stretch
   const bassBounce = audioData.bass * 0.15
@@ -859,7 +862,7 @@ const drawGhostCharacter = (ctx, x, y, angle, isScared, scareIntensity) => {
   // 2. DRAW MAIN WHITE GHOST BODY
   // ----------------------------------------------------
   const gw = 68 // half width ~ 34
-  const gh = 90 // total height
+  const gh = 80 // total height
   const topY = -gh * 0.5
   const botY = gh * 0.5
   const halfW = gw * 0.5
@@ -1684,7 +1687,7 @@ const openPlaylist = () => {
     user-select: none !important;
 }
 
-  
+
 .gf-container {
   position: fixed;
   top: 0;
