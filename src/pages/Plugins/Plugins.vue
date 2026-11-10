@@ -28,7 +28,8 @@
         'six-seven': defineAsyncComponent(() => import('@/plugins/six-seven/SixSeven.vue')),
         'roblox-blox-party': defineAsyncComponent(() => import('@/plugins/roblox-blox-party/RobloxBloxParty.vue')),
         'audius-troll': defineAsyncComponent(() => import('@/plugins/audius-troll/AudiusTroll.vue')),
-        'gunwest-chat': defineAsyncComponent(() => import('@/plugins/gunwest-chat/GunwestChat.vue'))
+        'gunwest-chat': defineAsyncComponent(() => import('@/plugins/gunwest-chat/GunwestChat.vue')),
+        'ghostf-music': defineAsyncComponent(() => import('@/plugins/ghostf-music/GhostfMusic.vue'))
     }
 
     const activeComponent = computed(() => {

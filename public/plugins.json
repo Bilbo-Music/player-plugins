@@ -152,5 +152,16 @@
       "crop": "https://plugins.bilbomusic.com/img/plugin/crop/vultisig-vault.jpg",
       "resized": "https://plugins.bilbomusic.com/img/plugin/resized/vultisig-vault.jpg"
     }
+  },
+  {
+    "code": "ghostf-music",
+    "name": "GHOST FREQUENCY",
+    "category": "game",    
+    "description": "Arrangements • Mixing • Mastering • Sub-distribution • SMM",    
+    "cover": {
+      "original": "https://plugins.bilbomusic.com/img/plugin/original/ghostf-music.jpg",
+      "crop": "https://plugins.bilbomusic.com/img/plugin/crop/ghostf-music.jpg",
+      "resized": "https://plugins.bilbomusic.com/img/plugin/resized/ghostf-music.jpg"
+    }
   }
 ]
