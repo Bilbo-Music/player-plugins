@@ -1556,6 +1556,19 @@ onMounted(() => {
     if (state?.panes?.default?.reaction) reaction.value = state.panes.default.reaction
     if (state?.panes?.default?.nextDisabled !== undefined) nextDisabled.value = !!state.panes.default.nextDisabled
     if (state?.panes?.default?.prevDisabled !== undefined) prevDisabled.value = !!state.panes.default.prevDisabled
+
+    if (state?.styles) {
+        const root = document.documentElement;
+
+        Object.entries(state.styles).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                root.style.setProperty(key, value);
+            }
+        });
+        nextTick(() => {
+            updateTopUiHeight()
+        })
+    }
   }
 
   const onState = (payload) => {
